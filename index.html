@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>2026 東京行動嚮導</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --jp-white: #FCFBF9;
+            --jp-black: #2C2C2C;
+            --sakura: #F3D2D9;
+            --fuji-blue: #A5BFD2;
+        }
+        body {
+            font-family: 'Noto Sans JP', 'Noto Sans TC', sans-serif;
+            background-color: var(--jp-white);
+            color: var(--jp-black);
+            padding-bottom: 120px;
+        }
+        .app-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .nav-active { color: var(--jp-black); font-weight: 700; }
+        .nav-inactive { color: #A1A1AA; }
+        
+        .tag-eat { background-color: #FEE2E2; color: #B91C1C; } 
+        .tag-spot { background-color: #DBEAFE; color: #1E40AF; } 
+        .tag-trans { background-color: #F3F4F6; color: #374151; } 
+        .tag-buy { background-color: #FEF3C7; color: #92400E; } 
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .page { display: none; animation: fadeIn 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .click-effect:active { transform: scale(0.97); }
+        
+        .input-field { background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 12px; padding: 10px 14px; font-size: 14px; width: 100%; }
+        .payer-btn, .currency-btn { border: 2px solid transparent; transition: all 0.2s; background-color: #f3f4f6; color: #9CA3AF; }
+        .payer-btn.active, .currency-btn.active { border-color: var(--jp-black); background-color: white; color: var(--jp-black); font-weight: bold; }
+        .member-checkbox:checked + label { background-color: var(--fuji-blue); color: white; border-color: var(--fuji-blue); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-6 py-4 flex justify-between items-end border-b border-gray-100">
+        <div>
+            <p class="text-[10px] tracking-widest text-gray-400 font-bold uppercase">TOKYO TRIP 2026.03.25 - 03.31</p>
+            <h1 id="current-page-title" class="text-xl font-bold">每日行程</h1>
+        </div>
+        <div class="text-right">
+            <span id="header-date" class="text-xs font-medium text-gray-500 underline decoration-sakura underline-offset-4">03/25 WED</span>
+        </div>
+    </header>
+
+    <main class="px-4 py-4 max-w-md mx-auto">
+        
+        <!-- PAGE 1: 行程 -->
+        <section id="page-schedule" class="page active">
+            <div class="flex gap-3 overflow-x-auto no-scrollbar mb-6 pb-2" id="day-scroller" style="scrollbar-width: none;"></div>
+            <div id="timeline" class="space-y-6"></div>
+        </section>
+
+        <!-- PAGE 2: 預約與資訊 -->
+        <section id="page-tools" class="page">
+            <div class="space-y-6">
+                <div class="app-card p-5 border-t-4 border-red-500">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">⏰ 搶票預約日</h3>
+                    <div class="space-y-4 text-sm text-gray-600 font-medium">
+                        <div class="flex justify-between p-3 bg-red-50 rounded-xl"><span>吉卜力美術館 (3/27票)</span><span class="font-bold">2/10 10:00</span></div>
+                        <div class="flex justify-between p-3 bg-red-50 rounded-xl"><span>Pokemon Cafe (3/26票)</span><span class="font-bold">2/23 18:00</span></div>
+                        <div class="flex justify-between p-3 bg-blue-50 rounded-xl"><span>富士回遊 (3/29票)</span><span class="font-bold">2/27 10:00</span></div>
+                    </div>
+                </div>
+                <div class="app-card p-5">
+                    <h3 class="font-bold text-lg border-l-4 border-blue-500 pl-2 mb-4">✈️ 航班 & 🏨 住宿</h3>
+                    <div class="space-y-3 text-xs text-gray-600 leading-relaxed">
+                        <p class="font-bold text-blue-600 uppercase">Scoot TR898 | 03/25 06:40 TPE</p>
+                        <p class="font-bold text-red-600 uppercase">Peach MM625 | 03/31 16:50 NRT</p>
+                        <p class="pt-2 border-t border-gray-100 font-medium text-gray-800">住宿：VIA INN 秋葉原</p>
+                        <a href="https://www.google.com/maps/search/?api=1&query=VIA+INN+Akihabara" target="_blank" class="block text-center mt-2 py-2 bg-gray-100 rounded-xl font-bold">📍 導航至飯店</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 3: 帳本 -->
+        <section id="page-ledger" class="page">
+            <!-- 結算總覽 -->
+            <div class="app-card p-5 mb-6 bg-slate-900 text-white shadow-xl">
+                <h3 class="font-bold opacity-80 mb-4 text-center text-xs tracking-widest uppercase italic">結算總覽 (幣別獨立)</h3>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="text-center">
+                        <p class="text-[10px] font-bold opacity-50 mb-2 border-b border-white/10 pb-1 italic uppercase">Yang</p>
+                        <p id="sum-jpy-羊" class="font-mono text-[11px] text-fuji-blue italic">¥ 0</p>
+                        <p id="sum-twd-羊" class="font-mono text-[11px] text-sakura">$ 0</p>
+                    </div>
+                    <div class="text-center border-x border-white/5">
+                        <p class="text-[10px] font-bold opacity-50 mb-2 border-b border-white/10 pb-1 italic uppercase">P</p>
+                        <p id="sum-jpy-P" class="font-mono text-[11px] text-fuji-blue italic">¥ 0</p>
+                        <p id="sum-twd-P" class="font-mono text-[11px] text-sakura">$ 0</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[10px] font-bold opacity-50 mb-2 border-b border-white/10 pb-1 italic uppercase">Feng</p>
+                        <p id="sum-jpy-馮" class="font-mono text-[11px] text-fuji-blue italic">¥ 0</p>
+                        <p id="sum-twd-馮" class="font-mono text-[11px] text-sakura">$ 0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 新增支出 -->
+            <div class="app-card p-5 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-sm">記一筆支出</h3>
+                    <div class="flex bg-gray-100 rounded-lg p-1 gap-1">
+                        <button onclick="setCurrency('JPY')" id="cur-JPY" class="currency-btn px-4 py-1 rounded-md text-[10px]">JPY</button>
+                        <button onclick="setCurrency('TWD')" id="cur-TWD" class="currency-btn px-4 py-1 rounded-md text-[10px]">TWD</button>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <input type="text" id="exp-name" placeholder="項目名稱 (如：敘敘苑)" class="input-field">
+                    <input type="number" id="exp-total" placeholder="金額" class="input-field font-mono">
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 mb-2 uppercase">誰墊錢？</p>
+                        <div class="flex gap-2">
+                            <button onclick="setPayer('羊')" id="payer-羊" class="payer-btn flex-grow py-2 rounded-xl text-xs font-bold">羊</button>
+                            <button onclick="setPayer('P')" id="payer-P" class="payer-btn flex-grow py-2 rounded-xl text-xs font-bold">P</button>
+                            <button onclick="setPayer('馮')" id="payer-馮" class="payer-btn flex-grow py-2 rounded-xl text-xs font-bold">馮</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase">分帳成員</p>
+                            <div class="flex items-center gap-1">
+                                <input type="checkbox" id="split-mode" onchange="toggleSplitMode()" class="w-3 h-3">
+                                <label for="split-mode" class="text-[10px] font-bold text-blue-500 uppercase italic">Custom</label>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="relative">
+                                <input type="checkbox" id="member-羊" checked class="member-checkbox hidden">
+                                <label for="member-羊" class="block text-center py-2 rounded-xl border border-gray-100 bg-gray-50 text-[10px] font-bold cursor-pointer">羊</label>
+                                <input type="number" id="custom-羊" placeholder="0" class="custom-val hidden w-full mt-1 text-center text-[10px] font-mono border-b focus:outline-none p-1">
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" id="member-P" checked class="member-checkbox hidden">
+                                <label for="member-P" class="block text-center py-2 rounded-xl border border-gray-100 bg-gray-50 text-[10px] font-bold cursor-pointer">P</label>
+                                <input type="number" id="custom-P" placeholder="0" class="custom-val hidden w-full mt-1 text-center text-[10px] font-mono border-b focus:outline-none p-1">
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" id="member-馮" checked class="member-checkbox hidden">
+                                <label for="member-馮" class="block text-center py-2 rounded-xl border border-gray-100 bg-gray-50 text-[10px] font-bold cursor-pointer">馮</label>
+                                <input type="number" id="custom-馮" placeholder="0" class="custom-val hidden w-full mt-1 text-center text-[10px] font-mono border-b focus:outline-none p-1">
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="addExpense()" class="w-full bg-gray-900 text-white py-3 rounded-xl font-bold text-sm click-effect shadow-lg">新增紀錄</button>
+                </div>
+            </div>
+            <div id="expense-list" class="space-y-3"></div>
+        </section>
+    </main>
+
+    <!-- Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-100 px-6 py-3 flex justify-between items-center z-50">
+        <button onclick="switchPage('schedule')" id="nav-item-schedule" class="flex flex-col items-center gap-1 nav-active transition-all">
+            <span class="text-2xl">🗓️</span><span class="text-[10px] font-bold">行程</span>
+        </button>
+        <button onclick="switchPage('tools')" id="nav-item-tools" class="flex flex-col items-center gap-1 nav-inactive transition-all">
+            <span class="text-2xl">⏰</span><span class="text-[10px] font-bold">預約</span>
+        </button>
+        <button onclick="switchPage('ledger')" id="nav-item-ledger" class="flex flex-col items-center gap-1 nav-inactive transition-all">
+            <span class="text-2xl">💰</span><span class="text-[10px] font-bold">帳本</span>
+        </button>
+    </nav>
+
+    <script>
+        // --- 行程數據 ---
+        const tripData = [
+            { day: 1, date: "03/25 WED", events: [
+                { time: "06:40", type: "trans", title: "桃園 T1 出發 (TR898)", note: "酷航：預計 10:45 抵達 NRT T2", nav: "Taoyuan Airport T1" },
+                { time: "11:58", type: "trans", title: "Skyliner 22 號", note: "12:58 抵達日暮里站 (<a href='https://www.keisei.co.jp/keisei/tetudou/skyliner/tc/traffic/skyliner.php' target='_blank' class='text-blue-500 underline decoration-blue-200'>查看時刻表</a>)", nav: "NRT" },
+                { time: "13:30", type: "spot", title: "VIA INN 秋葉原寄行李", note: "Check-in 休息", nav: "VIA INN Akihabara" },
+                { time: "15:00", type: "eat", title: "Eggslut Shinjuku", note: "推薦 Fairfax Sandwich", nav: "Eggslut Shinjuku" },
+                { time: "16:30", type: "buy", title: "新宿伊勢丹 & 治一郎", note: "B1 買年輪蛋糕與布丁", nav: "Isetan Shinjuku" },
+                { time: "19:00", type: "eat", title: "牛舌的檸檬", note: "預約制新宿最紅牛舌", nav: "Gyutan no Lemon Shinjuku" }
+            ]},
+            { day: 2, date: "03/26 THU", events: [
+                { time: "09:30", type: "spot", title: "王子神社 & 妙義神社", note: "古老神社巡禮", nav: "Oji Shrine" },
+                { time: "11:30", type: "buy", title: "Pokemon Mega Tokyo", note: "池袋太陽城", nav: "Pokemon Center Mega Tokyo" },
+                { time: "13:30", type: "eat", title: "Pokemon Cafe", note: "日本橋預約制餐廳", nav: "Pokemon Center Tokyo DX" }
+            ]},
+            { day: 3, date: "03/27 FRI", events: [
+                { time: "10:00", type: "spot", title: "三鷹之森吉卜力", note: "宮崎駿美術館", nav: "Ghibli Museum" },
+                { time: "13:30", type: "spot", title: "豪德寺", note: "震撼招財貓寺廟", nav: "Gotokuji Temple" },
+                { time: "15:30", type: "buy", title: "Poppy / Tokyo Bopper", note: "原宿小眾潮流", nav: "Poppy Tokyo Harajuku" },
+                { time: "16:30", type: "buy", title: "Kinetics 球鞋店", note: "限量版潮流鞋店", nav: "Kinetics Harajuku" },
+                { time: "17:30", type: "spot", title: "Pokemon Shibuya", note: "PARCO 拍 1:1 超夢", nav: "Pokemon Center Shibuya" },
+                { time: "19:30", type: "eat", title: "Peter Luger 牛排", note: "惠比壽熟成牛排名店", nav: "Peter Luger Steak House" }
+            ]},
+            { day: 4, date: "03/28 SAT", events: [
+                { time: "10:00", type: "spot", title: "PokéPark KANTO", note: "讀賣樂園冒險", nav: "Yomiuriland" },
+                { time: "19:30", type: "eat", title: "肉燒屋 D-29 燒肉", note: "和牛專家私房店", nav: "Nikuyakiya D-29" }
+            ]},
+            { day: 5, date: "03/29 SUN", events: [
+                { time: "09:30", type: "trans", title: "富士回遊直達河口湖", note: "新宿 9:30 直通出發", nav: "Kawaguchiko" },
+                { time: "11:30", type: "spot", title: "新倉山淺草公園", note: "經典富士山景 (<a href='https://fuji-san.info/zh-tw/index.html' target='_blank' class='text-blue-500 underline decoration-blue-200'>能見度指數</a>)", nav: "Chureito Pagoda" },
+                { time: "14:30", type: "spot", title: "富士御室淺間神社", note: "富士山最古老神社", nav: "Fuji Omuro Asama Shrine" },
+                { time: "16:30", type: "spot", title: "大石公園散步", note: "欣赏全景富士", nav: "Oishi Park" }
+            ]},
+            { day: 6, date: "03/30 MON", events: [
+                { time: "09:30", type: "spot", title: "今戶神社", note: "招財貓神社", nav: "Imado Shrine" },
+                { time: "11:30", type: "buy", title: "晴空塔 & Pokemon", note: "1:1 烈空坐必拍", nav: "Pokemon Center Skytree Town" },
+                { time: "13:30", type: "eat", title: "Sapporo Soup Curry Dominica", note: "札幌湯咖哩名店", nav: "Sapporo Soup Curry Tokyo Dominica" },
+                { time: "15:30", type: "buy", title: "Pokemon Center Tokyo DX", note: "卡比獸必拍！日本橋。", nav: "Pokemon Center Tokyo DX" },
+                { time: "18:30", type: "eat", title: "根室花丸 銀座", note: "北海道最強壽司", nav: "Nemuro Hanamaru Ginza" }
+            ]},
+            { day: 7, date: "03/31 TUE", events: [
+                { time: "09:30", type: "spot", title: "上野公園櫻花", note: "漫步櫻花隧道", nav: "Ueno Park" },
+                { time: "11:00", type: "buy", title: "Yamashiroya 玩具店", note: "上野站前玩具天堂", nav: "Yamashiroya Ueno" },
+                { time: "13:30", type: "trans", title: "前往成田機場 T1", note: "預計 14:30 抵達車站", nav: "Keisei Ueno" },
+                { time: "16:50", type: "trans", title: "成田 T1 返台 (MM625)", note: "樂桃：預計 19:40 抵達桃園 T1", nav: "Narita Airport T1" }
+            ]}
+        ];
+
+        let expenses = JSON.parse(localStorage.getItem('tokyo_split_v4')) || [];
+        let currentPayer = '羊';
+        let currentCurrency = 'JPY';
+
+        function init() {
+            const scroller = document.getElementById('day-scroller');
+            scroller.innerHTML = [1,2,3,4,5,6,7].map((d, idx) => `
+                <button onclick="changeDay(${idx})" id="day-btn-${idx}" class="flex-shrink-0 w-14 h-20 rounded-2xl flex flex-col items-center justify-center border-2 border-transparent bg-white shadow-sm transition-all click-effect">
+                    <span class="text-[10px] mb-1">D${d}</span>
+                    <span class="text-lg font-bold">${d===1?'25':d===2?'26':d===3?'27':d===4?'28':d===5?'29':d===6?'30':'31'}</span>
+                </button>
+            `).join('');
+            changeDay(0);
+            setPayer('羊');
+            setCurrency('JPY');
+            updateLedgerUI();
+        }
+
+        function changeDay(idx) {
+            document.querySelectorAll('#day-scroller button').forEach((btn, i) => {
+                btn.className = i === idx ? 
+                    "flex-shrink-0 w-14 h-20 rounded-2xl flex flex-col items-center justify-center border-2 border-jp-black bg-jp-black text-gray-400 shadow-sm" : 
+                    "flex-shrink-0 w-14 h-20 rounded-2xl flex flex-col items-center justify-center border-2 border-transparent bg-white text-gray-900 shadow-sm";
+            });
+            const dayData = tripData[idx];
+            document.getElementById('header-date').innerText = dayData.date;
+            document.getElementById('timeline').innerHTML = dayData.events.map(ev => `
+                <div class="flex gap-4">
+                    <div class="flex flex-col items-center"><div class="w-2.5 h-2.5 rounded-full bg-slate-300 mt-2"></div><div class="w-0.5 flex-grow bg-slate-100"></div></div>
+                    <div class="app-card flex-grow p-4 mb-2">
+                        <span class="text-xs font-mono font-bold text-blue-500">${ev.time}</span>
+                        <h4 class="font-bold text-sm text-gray-800">${ev.title}</h4>
+                        <div class="text-[11px] text-gray-500 leading-normal mb-1">${ev.note}</div>
+                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.nav)}" target="_blank" class="block text-center mt-2 py-1.5 bg-gray-900 text-white rounded-lg text-[10px] font-bold">🧭 導航</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`page-${pageId}`).classList.add('active');
+            document.querySelectorAll('nav button').forEach(btn => { btn.classList.remove('nav-active'); btn.classList.add('nav-inactive'); });
+            document.getElementById(`nav-item-${pageId}`).classList.add('nav-active');
+            document.getElementById('current-page-title').innerText = pageId === 'schedule' ? '每日行程' : (pageId === 'ledger' ? '分帳本' : '預約中心');
+        }
+
+        function setCurrency(cur) {
+            currentCurrency = cur;
+            document.querySelectorAll('.currency-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`cur-${cur}`).classList.add('active');
+        }
+
+        function setPayer(who) {
+            currentPayer = who;
+            document.querySelectorAll('.payer-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`payer-${who}`).classList.add('active');
+        }
+
+        function toggleSplitMode() {
+            const isCustom = document.getElementById('split-mode').checked;
+            document.querySelectorAll('.custom-val').forEach(el => el.classList.toggle('hidden', !isCustom));
+        }
+
+        function addExpense() {
+            const name = document.getElementById('exp-name').value;
+            const amount = parseFloat(document.getElementById('exp-total').value);
+            const isCustom = document.getElementById('split-mode').checked;
+            if (!name || isNaN(amount)) return alert("請輸入金額與名稱");
+            const participants = [];
+            ['羊', 'P', '馮'].forEach(m => { if(document.getElementById(`member-${m}`).checked) participants.push(m); });
+            if (participants.length === 0) return alert("請選擇成員");
+            let splits = {};
+            if (isCustom) {
+                let sum = 0;
+                participants.forEach(m => {
+                    const v = parseFloat(document.getElementById(`custom-${m}`).value) || 0;
+                    splits[m] = v; sum += v;
+                });
+                if (Math.abs(sum - amount) > 1) return alert("自訂金額與總額不符");
+            } else {
+                const avg = Math.round((amount / participants.length) * 100) / 100;
+                participants.forEach(m => splits[m] = avg);
+            }
+            expenses.unshift({ id: Date.now(), name, amount, currency: currentCurrency, payer: currentPayer, splits });
+            localStorage.setItem('tokyo_split_v4', JSON.stringify(expenses));
+            document.getElementById('exp-name').value = '';
+            document.getElementById('exp-total').value = '';
+            updateLedgerUI();
+        }
+
+        function deleteExpense(id) {
+            if(confirm('刪除此紀錄？')) {
+                expenses = expenses.filter(e => e.id !== id);
+                localStorage.setItem('tokyo_split_v4', JSON.stringify(expenses));
+                updateLedgerUI();
+            }
+        }
+
+        function updateLedgerUI() {
+            const list = document.getElementById('expense-list');
+            const balance = { '羊': { JPY: 0, TWD: 0 }, 'P': { JPY: 0, TWD: 0 }, '馮': { JPY: 0, TWD: 0 } };
+            list.innerHTML = expenses.map(exp => {
+                const cur = exp.currency;
+                ['羊', 'P', '馮'].forEach(m => {
+                    const share = exp.splits[m] || 0;
+                    if (m === exp.payer) balance[m][cur] -= (exp.amount - share);
+                    else balance[m][cur] += share;
+                });
+                return `
+                    <div class="app-card p-4 border-l-4 ${exp.payer==='羊'?'border-rose-200':exp.payer==='P'?'border-blue-200':'border-amber-200'}">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="text-xs font-bold text-gray-800">${exp.name}</h4>
+                                <p class="text-[10px] font-mono text-gray-400">${cur === 'JPY' ? '¥' : '$'} ${exp.amount.toLocaleString()} | 墊付: ${exp.payer}</p>
+                            </div>
+                            <button onclick="deleteExpense(${exp.id})" class="text-gray-300 px-2 text-sm font-bold">✕</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            ['羊', 'P', '馮'].forEach(m => {
+                const j = Math.round(balance[m].JPY);
+                const t = Math.round(balance[m].TWD);
+                document.getElementById(`sum-jpy-${m}`).innerText = `¥ ${j.toLocaleString()}`;
+                document.getElementById(`sum-twd-${m}`).innerText = `$ ${t.toLocaleString()}`;
+                document.getElementById(`sum-jpy-${m}`).className = `font-mono text-[11px] ${j > 0 ? 'text-rose-400' : 'text-fuji-blue'}`;
+                document.getElementById(`sum-twd-${m}`).className = `font-mono text-[11px] ${t > 0 ? 'text-rose-400' : 'text-fuji-blue'}`;
+            });
+        }
+        window.onload = init;
+    </script>
+</body>
+</html>
