@@ -47,7 +47,6 @@
 </head>
 <body class="antialiased">
 
-    <!-- Header -->
     <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-6 py-4 flex justify-between items-end border-b border-gray-100">
         <div>
             <p class="text-[10px] tracking-widest text-gray-400 font-bold uppercase">TOKYO TRIP 2026.03.25 - 03.31</p>
@@ -73,7 +72,7 @@
                     <h3 class="font-bold text-lg mb-4 flex items-center gap-2">⏰ 搶票預約日</h3>
                     <div class="space-y-4 text-sm text-gray-600 font-medium">
                         <div class="flex justify-between p-3 bg-red-50 rounded-xl"><span>吉卜力美術館 (3/27票)</span><span class="font-bold">2/10 10:00</span></div>
-                        <div class="flex justify-between p-3 bg-red-50 rounded-xl"><span>Pokemon Cafe (3/26票)</span><span class="font-bold">2/23 18:00</span></div>
+                        <div class="flex justify-between p-3 bg-red-50 rounded-xl"><span>Pokemon Cafe (3/30票)</span><span class="font-bold">2/27 18:00</span></div>
                         <div class="flex justify-between p-3 bg-blue-50 rounded-xl"><span>富士回遊 (3/29票)</span><span class="font-bold">2/27 10:00</span></div>
                     </div>
                 </div>
@@ -91,9 +90,8 @@
 
         <!-- PAGE 3: 帳本 -->
         <section id="page-ledger" class="page">
-            <!-- 結算總覽 -->
             <div class="app-card p-5 mb-6 bg-slate-900 text-white shadow-xl">
-                <h3 class="font-bold opacity-80 mb-4 text-center text-xs tracking-widest uppercase italic">結算總覽 (幣別獨立)</h3>
+                <h3 class="font-bold opacity-80 mb-4 text-center text-xs tracking-widest uppercase">結算總覽 (幣別獨立)</h3>
                 <div class="grid grid-cols-3 gap-2">
                     <div class="text-center">
                         <p class="text-[10px] font-bold opacity-50 mb-2 border-b border-white/10 pb-1 italic uppercase">Yang</p>
@@ -113,7 +111,6 @@
                 </div>
             </div>
 
-            <!-- 新增支出 -->
             <div class="app-card p-5 mb-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-bold text-sm">記一筆支出</h3>
@@ -123,7 +120,7 @@
                     </div>
                 </div>
                 <div class="space-y-4">
-                    <input type="text" id="exp-name" placeholder="項目名稱 (如：敘敘苑)" class="input-field">
+                    <input type="text" id="exp-name" placeholder="項目名稱" class="input-field">
                     <input type="number" id="exp-total" placeholder="金額" class="input-field font-mono">
                     <div>
                         <p class="text-[10px] font-bold text-gray-400 mb-2 uppercase">誰墊錢？</p>
@@ -166,7 +163,6 @@
         </section>
     </main>
 
-    <!-- Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-100 px-6 py-3 flex justify-between items-center z-50">
         <button onclick="switchPage('schedule')" id="nav-item-schedule" class="flex flex-col items-center gap-1 nav-active transition-all">
             <span class="text-2xl">🗓️</span><span class="text-[10px] font-bold">行程</span>
@@ -180,52 +176,65 @@
     </nav>
 
     <script>
-        // --- 行程數據 ---
         const tripData = [
-            { day: 1, date: "03/25 WED", events: [
-                { time: "06:40", type: "trans", title: "桃園 T1 出發 (TR898)", note: "酷航：預計 10:45 抵達 NRT T2", nav: "Taoyuan Airport T1" },
-                { time: "11:58", type: "trans", title: "Skyliner 22 號", note: "12:58 抵達日暮里站 (<a href='https://www.keisei.co.jp/keisei/tetudou/skyliner/tc/traffic/skyliner.php' target='_blank' class='text-blue-500 underline decoration-blue-200'>查看時刻表</a>)", nav: "NRT" },
-                { time: "13:30", type: "spot", title: "VIA INN 秋葉原寄行李", note: "Check-in 休息", nav: "VIA INN Akihabara" },
-                { time: "15:00", type: "eat", title: "Eggslut Shinjuku", note: "推薦 Fairfax Sandwich", nav: "Eggslut Shinjuku" },
-                { time: "16:30", type: "buy", title: "新宿伊勢丹 & 治一郎", note: "B1 買年輪蛋糕與布丁", nav: "Isetan Shinjuku" },
-                { time: "19:00", type: "eat", title: "牛舌的檸檬", note: "預約制新宿最紅牛舌", nav: "Gyutan no Lemon Shinjuku" }
-            ]},
-            { day: 2, date: "03/26 THU", events: [
-                { time: "09:30", type: "spot", title: "王子神社 & 妙義神社", note: "古老神社巡禮", nav: "Oji Shrine" },
-                { time: "11:30", type: "buy", title: "Pokemon Mega Tokyo", note: "池袋太陽城", nav: "Pokemon Center Mega Tokyo" },
-                { time: "13:30", type: "eat", title: "Pokemon Cafe", note: "日本橋預約制餐廳", nav: "Pokemon Center Tokyo DX" }
-            ]},
-            { day: 3, date: "03/27 FRI", events: [
-                { time: "10:00", type: "spot", title: "三鷹之森吉卜力", note: "宮崎駿美術館", nav: "Ghibli Museum" },
-                { time: "13:30", type: "spot", title: "豪德寺", note: "震撼招財貓寺廟", nav: "Gotokuji Temple" },
-                { time: "15:30", type: "buy", title: "Poppy / Tokyo Bopper", note: "原宿小眾潮流", nav: "Poppy Tokyo Harajuku" },
-                { time: "16:30", type: "buy", title: "Kinetics 球鞋店", note: "限量版潮流鞋店", nav: "Kinetics Harajuku" },
-                { time: "17:30", type: "spot", title: "Pokemon Shibuya", note: "PARCO 拍 1:1 超夢", nav: "Pokemon Center Shibuya" },
-                { time: "19:30", type: "eat", title: "Peter Luger 牛排", note: "惠比壽熟成牛排名店", nav: "Peter Luger Steak House" }
-            ]},
-            { day: 4, date: "03/28 SAT", events: [
-                { time: "10:00", type: "spot", title: "PokéPark KANTO", note: "讀賣樂園冒險", nav: "Yomiuriland" },
-                { time: "19:30", type: "eat", title: "肉燒屋 D-29 燒肉", note: "和牛專家私房店", nav: "Nikuyakiya D-29" }
-            ]},
-            { day: 5, date: "03/29 SUN", events: [
-                { time: "09:30", type: "trans", title: "富士回遊直達河口湖", note: "新宿 9:30 直通出發", nav: "Kawaguchiko" },
-                { time: "11:30", type: "spot", title: "新倉山淺草公園", note: "經典富士山景 (<a href='https://fuji-san.info/zh-tw/index.html' target='_blank' class='text-blue-500 underline decoration-blue-200'>能見度指數</a>)", nav: "Chureito Pagoda" },
-                { time: "14:30", type: "spot", title: "富士御室淺間神社", note: "富士山最古老神社", nav: "Fuji Omuro Asama Shrine" },
-                { time: "16:30", type: "spot", title: "大石公園散步", note: "欣赏全景富士", nav: "Oishi Park" }
-            ]},
-            { day: 6, date: "03/30 MON", events: [
-                { time: "09:30", type: "spot", title: "今戶神社", note: "招財貓神社", nav: "Imado Shrine" },
-                { time: "11:30", type: "buy", title: "晴空塔 & Pokemon", note: "1:1 烈空坐必拍", nav: "Pokemon Center Skytree Town" },
-                { time: "13:30", type: "eat", title: "Sapporo Soup Curry Dominica", note: "札幌湯咖哩名店", nav: "Sapporo Soup Curry Tokyo Dominica" },
-                { time: "15:30", type: "buy", title: "Pokemon Center Tokyo DX", note: "卡比獸必拍！日本橋。", nav: "Pokemon Center Tokyo DX" },
-                { time: "18:30", type: "eat", title: "根室花丸 銀座", note: "北海道最強壽司", nav: "Nemuro Hanamaru Ginza" }
-            ]},
-            { day: 7, date: "03/31 TUE", events: [
-                { time: "09:30", type: "spot", title: "上野公園櫻花", note: "漫步櫻花隧道", nav: "Ueno Park" },
-                { time: "11:00", type: "buy", title: "Yamashiroya 玩具店", note: "上野站前玩具天堂", nav: "Yamashiroya Ueno" },
-                { time: "13:30", type: "trans", title: "前往成田機場 T1", note: "預計 14:30 抵達車站", nav: "Keisei Ueno" },
-                { time: "16:50", type: "trans", title: "成田 T1 返台 (MM625)", note: "樂桃：預計 19:40 抵達桃園 T1", nav: "Narita Airport T1" }
-            ]}
+            {
+                day: 1, date: "03/25 WED", events: [
+                    { time: "06:40", type: "trans", title: "桃園 T1 出發 (TR898)", note: "酷航：預計 10:45 抵達 NRT T2", nav: "Taoyuan Airport T1" },
+                    { time: "11:58", type: "trans", title: "Skyliner 22 號", note: "12:58 抵達日暮里站 (<a href='https://www.keisei.co.jp/keisei/tetudou/skyliner/tc/traffic/skyliner.php' target='_blank' class='text-blue-500 underline decoration-blue-200'>查看時刻表</a>)", nav: "NRT" },
+                    { time: "13:30", type: "spot", title: "VIA INN 秋葉原寄行李", note: "飯店 Check-in 休息", nav: "VIA INN Akihabara" },
+                    { time: "15:00", type: "eat", title: "Eggslut Shinjuku", note: "推薦 Fairfax Sandwich", nav: "Eggslut Shinjuku" },
+                    { time: "16:30", type: "buy", title: "新宿伊勢丹 & 治一郎", note: "B1 買年輪蛋糕與布丁", nav: "Isetan Shinjuku" },
+                    { time: "19:00", type: "eat", title: "牛舌的檸檬", note: "預約制新宿最紅牛舌", nav: "Gyutan no Lemon Shinjuku" }
+                ]
+            },
+            {
+                day: 2, date: "03/26 THU", events: [
+                    { time: "09:30", type: "spot", title: "王子神社 & 妙義神社", note: "古老神社文化巡禮", nav: "Oji Shrine" },
+                    { time: "11:30", type: "buy", title: "Pokemon Mega Tokyo", note: "池袋太陽城購物", nav: "Pokemon Center Mega Tokyo" },
+                    { time: "13:30", type: "eat", title: "Pikachu Sweets", note: "必買寶可夢甜點", nav: "Pikachu Sweets" }
+                ]
+            },
+            {
+                day: 3, date: "03/27 FRI", events: [
+                    { time: "10:00", type: "spot", title: "三鷹之森吉卜力", note: "宮崎駿迷朝聖", nav: "Ghibli Museum" },
+                    { time: "13:30", type: "spot", title: "豪德寺", note: "震撼的上千隻招財貓", nav: "Gotokuji Temple" },
+                    { time: "15:30", type: "buy", title: "Poppy / Tokyo Bopper", note: "原宿小眾潮流設計", nav: "Poppy Tokyo Harajuku" },
+                    { time: "16:30", type: "buy", title: "Kinetics 球鞋店", note: "潮流限量鞋款巡禮", nav: "Kinetics Harajuku" },
+                    { time: "17:30", type: "spot", title: "Pokemon Shibuya", note: "PARCO 拍 1:1 超夢", nav: "Pokemon Center Shibuya" },
+                    { time: "19:30", type: "eat", title: "Peter Luger 牛排", note: "惠比壽熟成牛排名店", nav: "Peter Luger Steak House" }
+                ]
+            },
+            {
+                day: 4, date: "03/28 SAT", events: [
+                    { time: "10:00", type: "spot", title: "PokéPark KANTO", note: "讀賣樂園冒險", nav: "Yomiuriland" },
+                    { time: "19:30", type: "eat", title: "肉燒屋 D-29 燒肉", note: "和牛專家私房名店", nav: "Nikuyakiya D-29" }
+                ]
+            },
+            {
+                day: 5, date: "03/29 SUN", events: [
+                    { time: "09:30", type: "trans", title: "富士回遊直達河口湖", note: "新宿出發 9:30 直通", nav: "Kawaguchiko" },
+                    { time: "11:30", type: "spot", title: "新倉山淺草公園", note: "經典富士山景 (<a href='https://fuji-san.info/zh-tw/index.html' target='_blank' class='text-blue-500 underline decoration-blue-200'>能見度指數</a>)", nav: "Chureito Pagoda" },
+                    { time: "14:30", type: "spot", title: "富士御室淺間神社", note: "富士山最古老神社", nav: "Fuji Omuro Asama Shrine" },
+                    { time: "16:30", type: "spot", title: "大石公園散步", note: "欣賞全景夕陽富士", nav: "Oishi Park" }
+                ]
+            },
+            {
+                day: 6, date: "03/30 MON", events: [
+                    { time: "09:30", type: "spot", title: "今戶神社", note: "貓奴必去招財貓神社", nav: "Imado Shrine" },
+                    { time: "11:30", type: "buy", title: "晴空塔 & Pokemon", note: "1:1 烈空坐必拍", nav: "Pokemon Center Skytree Town" },
+                    { time: "13:30", type: "eat", title: "Sapporo Soup Curry Dominica", note: "札幌湯咖哩東京名店", nav: "Sapporo Soup Curry Tokyo Dominica" },
+                    { time: "15:30", type: "eat", title: "Pokemon Cafe", note: "日本橋預約制餐廳", nav: "Pokemon Cafe Tokyo DX" },
+                    { time: "17:30", type: "buy", title: "Pokemon Center Tokyo DX", note: "巨大卡比獸必拍！日本橋。", nav: "Pokemon Center Tokyo DX" },
+                    { time: "18:30", type: "eat", title: "根室花丸 銀座", note: "北海道最強壽司", nav: "Nemuro Hanamaru Ginza" }
+                ]
+            },
+            {
+                day: 7, date: "03/31 TUE", events: [
+                    { time: "11:00", type: "buy", title: "Yamashiroya 玩具店", note: "上野站前 7 層玩具天堂", nav: "Yamashiroya Ueno" },
+                    { time: "13:30", type: "trans", title: "前往成田機場 T1", note: "預計 14:30 抵達車站", nav: "Keisei Ueno" },
+                    { time: "16:50", type: "trans", title: "成田 T1 返台 (MM625)", note: "樂桃：預計 19:40 抵達桃園 T1", nav: "Narita Airport T1" }
+                ]
+            }
         ];
 
         let expenses = JSON.parse(localStorage.getItem('tokyo_split_v4')) || [];
@@ -296,7 +305,7 @@
             const name = document.getElementById('exp-name').value;
             const amount = parseFloat(document.getElementById('exp-total').value);
             const isCustom = document.getElementById('split-mode').checked;
-            if (!name || isNaN(amount)) return alert("請輸入金額與名稱");
+            if (!name || isNaN(amount)) return alert("請輸入正確金額與名稱");
             const participants = [];
             ['羊', 'P', '馮'].forEach(m => { if(document.getElementById(`member-${m}`).checked) participants.push(m); });
             if (participants.length === 0) return alert("請選擇成員");
@@ -320,7 +329,7 @@
         }
 
         function deleteExpense(id) {
-            if(confirm('刪除此紀錄？')) {
+            if(confirm('確定刪除此紀錄？')) {
                 expenses = expenses.filter(e => e.id !== id);
                 localStorage.setItem('tokyo_split_v4', JSON.stringify(expenses));
                 updateLedgerUI();
