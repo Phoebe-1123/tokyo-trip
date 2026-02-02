@@ -47,6 +47,7 @@
 </head>
 <body class="antialiased">
 
+    <!-- Header -->
     <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-6 py-4 flex justify-between items-end border-b border-gray-100">
         <div>
             <p class="text-[10px] tracking-widest text-gray-400 font-bold uppercase">TOKYO TRIP 2026.03.25 - 03.31</p>
@@ -90,27 +91,29 @@
 
         <!-- PAGE 3: 帳本 -->
         <section id="page-ledger" class="page">
+            <!-- 結算總覽 -->
             <div class="app-card p-5 mb-6 bg-slate-900 text-white shadow-xl">
                 <h3 class="font-bold opacity-80 mb-4 text-center text-xs tracking-widest uppercase">結算總覽 (幣別獨立)</h3>
                 <div class="grid grid-cols-3 gap-2">
                     <div class="text-center">
-                        <p class="text-[10px] font-bold opacity-50 mb-2 border-b border-white/10 pb-1 italic uppercase">Yang</p>
-                        <p id="sum-jpy-羊" class="font-mono text-[11px] text-fuji-blue italic">¥ 0</p>
+                        <p class="text-[10px] font-bold opacity-50 mb-2 border-b border-white/10 pb-1 uppercase">羊</p>
+                        <p id="sum-jpy-羊" class="font-mono text-[11px] text-fuji-blue">¥ 0</p>
                         <p id="sum-twd-羊" class="font-mono text-[11px] text-sakura">$ 0</p>
                     </div>
                     <div class="text-center border-x border-white/5">
-                        <p class="text-[10px] font-bold opacity-50 mb-2 border-b border-white/10 pb-1 italic uppercase">P</p>
-                        <p id="sum-jpy-P" class="font-mono text-[11px] text-fuji-blue italic">¥ 0</p>
+                        <p class="text-[10px] font-bold opacity-50 mb-2 border-b border-white/10 pb-1 uppercase">P</p>
+                        <p id="sum-jpy-P" class="font-mono text-[11px] text-fuji-blue">¥ 0</p>
                         <p id="sum-twd-P" class="font-mono text-[11px] text-sakura">$ 0</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-[10px] font-bold opacity-50 mb-2 border-b border-white/10 pb-1 italic uppercase">Feng</p>
-                        <p id="sum-jpy-馮" class="font-mono text-[11px] text-fuji-blue italic">¥ 0</p>
+                        <p class="text-[10px] font-bold opacity-50 mb-2 border-b border-white/10 pb-1 uppercase">馮</p>
+                        <p id="sum-jpy-馮" class="font-mono text-[11px] text-fuji-blue">¥ 0</p>
                         <p id="sum-twd-馮" class="font-mono text-[11px] text-sakura">$ 0</p>
                     </div>
                 </div>
             </div>
 
+            <!-- 新增支出 -->
             <div class="app-card p-5 mb-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-bold text-sm">記一筆支出</h3>
@@ -120,7 +123,7 @@
                     </div>
                 </div>
                 <div class="space-y-4">
-                    <input type="text" id="exp-name" placeholder="項目名稱" class="input-field">
+                    <input type="text" id="exp-name" placeholder="項目名稱 (如：敘敘苑)" class="input-field">
                     <input type="number" id="exp-total" placeholder="金額" class="input-field font-mono">
                     <div>
                         <p class="text-[10px] font-bold text-gray-400 mb-2 uppercase">誰墊錢？</p>
@@ -135,7 +138,7 @@
                             <p class="text-[10px] font-bold text-gray-400 uppercase">分帳成員</p>
                             <div class="flex items-center gap-1">
                                 <input type="checkbox" id="split-mode" onchange="toggleSplitMode()" class="w-3 h-3">
-                                <label for="split-mode" class="text-[10px] font-bold text-blue-500 uppercase italic">Custom</label>
+                                <label for="split-mode" class="text-[10px] font-bold text-blue-500 uppercase">自訂</label>
                             </div>
                         </div>
                         <div class="grid grid-cols-3 gap-2">
@@ -316,7 +319,7 @@
                     const v = parseFloat(document.getElementById(`custom-${m}`).value) || 0;
                     splits[m] = v; sum += v;
                 });
-                if (Math.abs(sum - amount) > 1) return alert("自訂金額與總額不符");
+                if (Math.abs(sum - amount) > 1) return alert("金額總和不符");
             } else {
                 const avg = Math.round((amount / participants.length) * 100) / 100;
                 participants.forEach(m => splits[m] = avg);
