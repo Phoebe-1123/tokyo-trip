@@ -43,11 +43,13 @@
         .payer-btn, .currency-btn { border: 2px solid transparent; transition: all 0.2s; background-color: #f3f4f6; color: #9CA3AF; }
         .payer-btn.active, .currency-btn.active { border-color: var(--jp-black); background-color: white; color: var(--jp-black); font-weight: bold; }
         .member-checkbox:checked + label { background-color: var(--fuji-blue); color: white; border-color: var(--fuji-blue); }
+        
+        /* 帳本文字不斜體 */
+        #page-ledger * { font-style: normal !important; }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- Header -->
     <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-6 py-4 flex justify-between items-end border-b border-gray-100">
         <div>
             <p class="text-[10px] tracking-widest text-gray-400 font-bold uppercase">TOKYO TRIP 2026.03.25 - 03.31</p>
@@ -91,7 +93,6 @@
 
         <!-- PAGE 3: 帳本 -->
         <section id="page-ledger" class="page">
-            <!-- 結算總覽 -->
             <div class="app-card p-5 mb-6 bg-slate-900 text-white shadow-xl">
                 <h3 class="font-bold opacity-80 mb-4 text-center text-xs tracking-widest uppercase">結算總覽 (幣別獨立)</h3>
                 <div class="grid grid-cols-3 gap-2">
@@ -113,7 +114,6 @@
                 </div>
             </div>
 
-            <!-- 新增支出 -->
             <div class="app-card p-5 mb-6">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-bold text-sm">記一筆支出</h3>
@@ -126,7 +126,7 @@
                     <input type="text" id="exp-name" placeholder="項目名稱 (如：敘敘苑)" class="input-field">
                     <input type="number" id="exp-total" placeholder="金額" class="input-field font-mono">
                     <div>
-                        <p class="text-[10px] font-bold text-gray-400 mb-2 uppercase">誰墊錢？</p>
+                        <p class="text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-tighter">誰墊錢？</p>
                         <div class="flex gap-2">
                             <button onclick="setPayer('羊')" id="payer-羊" class="payer-btn flex-grow py-2 rounded-xl text-xs font-bold">羊</button>
                             <button onclick="setPayer('P')" id="payer-P" class="payer-btn flex-grow py-2 rounded-xl text-xs font-bold">P</button>
@@ -135,7 +135,7 @@
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-2">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase">分帳成員</p>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">分帳成員</p>
                             <div class="flex items-center gap-1">
                                 <input type="checkbox" id="split-mode" onchange="toggleSplitMode()" class="w-3 h-3">
                                 <label for="split-mode" class="text-[10px] font-bold text-blue-500 uppercase">自訂</label>
@@ -159,7 +159,7 @@
                             </div>
                         </div>
                     </div>
-                    <button onclick="addExpense()" class="w-full bg-gray-900 text-white py-3 rounded-xl font-bold text-sm click-effect shadow-lg">新增紀錄</button>
+                    <button onclick="addExpense()" class="w-full bg-gray-900 text-white py-3 rounded-xl font-bold text-sm click-effect shadow-lg uppercase tracking-wider">新增紀錄</button>
                 </div>
             </div>
             <div id="expense-list" class="space-y-3"></div>
@@ -194,16 +194,22 @@
                 day: 2, date: "03/26 THU", events: [
                     { time: "09:30", type: "spot", title: "王子神社 & 妙義神社", note: "古老神社文化巡禮", nav: "Oji Shrine" },
                     { time: "11:30", type: "buy", title: "Pokemon Mega Tokyo", note: "池袋太陽城購物", nav: "Pokemon Center Mega Tokyo" },
-                    { time: "13:30", type: "eat", title: "Pikachu Sweets", note: "必買寶可夢甜點", nav: "Pikachu Sweets" }
+                    { time: "13:30", type: "eat", title: "Pikachu Sweets", note: "必買寶可夢甜點", nav: "Pikachu Sweets" },
+                    { time: "18:30", type: "eat", title: "鰻の成瀬 池袋店", note: "高CP值美味鰻魚飯", nav: "Unagi no Naruse Ikebukuro" }
                 ]
             },
             {
                 day: 3, date: "03/27 FRI", events: [
-                    { time: "10:00", type: "spot", title: "三鷹之森吉卜力", note: "宮崎駿迷朝聖", nav: "Ghibli Museum" },
+                    { 
+                        time: "10:00", type: "spot", title: "三鷹之森吉卜力", 
+                        note: "宮崎駿迷朝聖 (<a href='https://www.threads.com/@ally_jeffery_0810/post/DUQBc7skRsA/-' target='_blank' class='text-blue-500 underline'>中文指南地圖</a>)", 
+                        nav: "Ghibli Museum" 
+                    },
                     { time: "13:30", type: "spot", title: "豪德寺", note: "震撼的上千隻招財貓", nav: "Gotokuji Temple" },
                     { time: "15:30", type: "buy", title: "Poppy / Tokyo Bopper", note: "原宿小眾潮流設計", nav: "Poppy Tokyo Harajuku" },
                     { time: "16:30", type: "buy", title: "Kinetics 球鞋店", note: "潮流限量鞋款巡禮", nav: "Kinetics Harajuku" },
-                    { time: "17:30", type: "spot", title: "Pokemon Shibuya", note: "PARCO 拍 1:1 超夢", nav: "Pokemon Center Shibuya" },
+                    { time: "17:30", type: "buy", title: "tar（タァ）渋谷店", note: "澀谷潮流店巡禮", nav: "tar Shibuya" },
+                    { time: "18:30", type: "spot", title: "Pokemon Shibuya", note: "PARCO 拍 1:1 超夢", nav: "Pokemon Center Shibuya" },
                     { time: "19:30", type: "eat", title: "Peter Luger 牛排", note: "惠比壽熟成牛排名店", nav: "Peter Luger Steak House" }
                 ]
             },
@@ -226,8 +232,8 @@
                     { time: "09:30", type: "spot", title: "今戶神社", note: "貓奴必去招財貓神社", nav: "Imado Shrine" },
                     { time: "11:30", type: "buy", title: "晴空塔 & Pokemon", note: "1:1 烈空坐必拍", nav: "Pokemon Center Skytree Town" },
                     { time: "13:30", type: "eat", title: "Sapporo Soup Curry Dominica", note: "札幌湯咖哩東京名店", nav: "Sapporo Soup Curry Tokyo Dominica" },
-                    { time: "15:30", type: "eat", title: "Pokemon Cafe", note: "日本橋預約制餐廳", nav: "Pokemon Cafe Tokyo DX" },
-                    { time: "17:30", type: "buy", title: "Pokemon Center Tokyo DX", note: "巨大卡比獸必拍！日本橋。", nav: "Pokemon Center Tokyo DX" },
+                    { time: "15:30", type: "eat", title: "Pokemon Cafe", note: "日本橋預約制餐廳 (<a href='https://digital-stamprally.jp/web/793' target='_blank' class='text-blue-500 underline'>寶可夢集章活動</a>)", nav: "Pokemon Cafe Tokyo DX" },
+                    { time: "17:30", type: "buy", title: "Pokemon Center Tokyo DX", note: "巨大卡比獸必拍！日本橋。 (<a href='https://digital-stamprally.jp/web/793' target='_blank' class='text-blue-500 underline'>寶可夢集章活動</a>)", nav: "Pokemon Center Tokyo DX" },
                     { time: "18:30", type: "eat", title: "根室花丸 銀座", note: "北海道最強壽司", nav: "Nemuro Hanamaru Ginza" }
                 ]
             },
@@ -271,8 +277,8 @@
                     <div class="flex flex-col items-center"><div class="w-2.5 h-2.5 rounded-full bg-slate-300 mt-2"></div><div class="w-0.5 flex-grow bg-slate-100"></div></div>
                     <div class="app-card flex-grow p-4 mb-2">
                         <span class="text-xs font-mono font-bold text-blue-500">${ev.time}</span>
-                        <h4 class="font-bold text-sm text-gray-800">${ev.title}</h4>
-                        <div class="text-[11px] text-gray-500 leading-normal mb-1">${ev.note}</div>
+                        <h4 class="font-bold text-sm text-gray-800 font-sans">${ev.title}</h4>
+                        <div class="text-[11px] text-gray-500 leading-normal mb-1 font-sans">${ev.note}</div>
                         <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.nav)}" target="_blank" class="block text-center mt-2 py-1.5 bg-gray-900 text-white rounded-lg text-[10px] font-bold">🧭 導航</a>
                     </div>
                 </div>
@@ -284,7 +290,7 @@
             document.getElementById(`page-${pageId}`).classList.add('active');
             document.querySelectorAll('nav button').forEach(btn => { btn.classList.remove('nav-active'); btn.classList.add('nav-inactive'); });
             document.getElementById(`nav-item-${pageId}`).classList.add('nav-active');
-            document.getElementById('current-page-title').innerText = pageId === 'schedule' ? '每日行程' : (pageId === 'ledger' ? '分帳本' : '預約中心');
+            document.getElementById('current-page-title').innerText = pageId === 'schedule' ? '每日行程' : (pageId === 'ledger' ? '帳本' : '預約中心');
         }
 
         function setCurrency(cur) {
@@ -353,8 +359,8 @@
                     <div class="app-card p-4 border-l-4 ${exp.payer==='羊'?'border-rose-200':exp.payer==='P'?'border-blue-200':'border-amber-200'}">
                         <div class="flex justify-between items-center">
                             <div>
-                                <h4 class="text-xs font-bold text-gray-800">${exp.name}</h4>
-                                <p class="text-[10px] font-mono text-gray-400">${cur === 'JPY' ? '¥' : '$'} ${exp.amount.toLocaleString()} | 墊付: ${exp.payer}</p>
+                                <h4 class="text-xs font-bold text-gray-800 font-sans">${exp.name}</h4>
+                                <p class="text-[10px] font-mono text-gray-400 font-sans">${cur === 'JPY' ? '¥' : '$'} ${exp.amount.toLocaleString()} | 墊付: ${exp.payer}</p>
                             </div>
                             <button onclick="deleteExpense(${exp.id})" class="text-gray-300 px-2 text-sm font-bold">✕</button>
                         </div>
