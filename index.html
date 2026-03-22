@@ -7,19 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --jp-white: #FCFBF9;
-            --jp-black: #2C2C2C;
-            --sakura: #F3D2D9;
-            --fuji-blue: #A5BFD2;
-            --pika-yellow: #FFCB05;
-        }
-        body {
-            font-family: 'Noto Sans JP', 'Noto Sans TC', sans-serif;
-            background-color: var(--jp-white);
-            color: var(--jp-black);
-            padding-bottom: 120px;
-        }
+        :root { --jp-white: #FCFBF9; --jp-black: #2C2C2C; --sakura: #F3D2D9; --fuji-blue: #A5BFD2; --pika-yellow: #FFCB05; }
+        body { font-family: 'Noto Sans JP', 'Noto Sans TC', sans-serif; background-color: var(--jp-white); color: var(--jp-black); padding-bottom: 120px; }
         .app-card { background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); }
         .nav-active { color: var(--jp-black); font-weight: 700; }
         .nav-inactive { color: #A1A1AA; }
@@ -32,32 +21,28 @@
         .page { display: none; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .click-effect:active { transform: scale(0.97); }
         .input-field { background: #F9FAFB; border: 1px solid #F3F4F6; border-radius: 12px; padding: 10px 14px; font-size: 14px; width: 100%; }
         .payer-btn, .currency-btn { border: 2px solid transparent; transition: all 0.2s; background-color: #f3f4f6; color: #9CA3AF; }
         .payer-btn.active, .currency-btn.active { border-color: var(--jp-black); background-color: white; color: var(--jp-black); font-weight: bold; }
-        .member-checkbox:checked + label { background-color: var(--fuji-blue); color: white; border-color: var(--fuji-blue); }
-        
-        /* 強制移除斜體 */
-        * { font-style: normal !important; }
-
-        /* PokéPark 表格樣式 */
+        * { font-style: normal !important; } /* 全局移除斜體 */
         .pk-table { width: 100%; font-size: 11px; border-collapse: collapse; border-radius: 12px; overflow: hidden; margin-top: 10px; }
         .pk-table th { background: #f8f8f8; color: #666; font-weight: bold; padding: 10px 8px; text-align: left; }
         .pk-table td { padding: 10px 8px; border-bottom: 1px solid #f3f3f3; color: #444; line-height: 1.5; }
-
-        /* 交通路徑 */
-        .route-line { border-left: 2px dashed #D1D5DB; margin-left: 11px; padding: 10px 0 10px 20px; position: relative; }
-        .route-line::before { content: '🚃'; position: absolute; left: -10px; top: 50%; transform: translateY(-50%); background: var(--jp-white); padding: 2px 0; font-size: 12px; }
-
-        /* 行李檢查表 */
+        .transit-container { border: 1px solid #f0f0f0; border-radius: 12px; padding: 12px; background: #fff; margin-top: 8px; }
+        .transit-step { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+        .transit-step:last-child { margin-bottom: 0; }
+        .step-icon { width: 20px; text-align: center; font-size: 14px; flex-shrink: 0; }
+        .step-info { flex-grow: 1; font-size: 12px; color: #333; }
+        .step-time { color: #999; font-size: 11px; white-space: nowrap; font-weight: bold; }
+        .step-subtext { font-size: 10px; color: #666; margin-top: 2px; }
         .check-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f9f9f9; }
         .check-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--jp-black); }
+        .route-line { border-left: 2px dashed #D1D5DB; margin-left: 11px; padding: 10px 0 10px 20px; position: relative; }
+        .route-line::before { content: '🚃'; position: absolute; left: -10px; top: 50%; transform: translateY(-50%); background: var(--jp-white); padding: 2px 0; font-size: 12px; }
     </style>
 </head>
-<body class="antialiased">
+<body>
 
-    <!-- Header -->
     <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-6 py-4 flex justify-between items-end border-b border-gray-100 font-sans">
         <div>
             <p class="text-[10px] tracking-widest text-gray-400 font-bold uppercase">2026 東京之旅 03.25 - 03.31</p>
@@ -69,153 +54,134 @@
     </header>
 
     <main class="px-4 py-4 max-w-md mx-auto">
-        
         <!-- PAGE 1: 行程 -->
         <section id="page-schedule" class="page active">
             <div class="flex gap-3 overflow-x-auto no-scrollbar mb-6 pb-2" id="day-scroller" style="scrollbar-width: none;"></div>
-            <div id="timeline" class="space-y-2"></div>
+            <div id="timeline" class="space-y-4"></div>
         </section>
 
         <!-- PAGE 2: 預約中心 -->
         <section id="page-tools" class="page">
             <div class="space-y-6">
-                <div class="app-card p-5 border-t-4 border-red-500">
-                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-gray-800 text-sm italic">⏰ 搶票預約時程</h3>
+                <div class="app-card p-5 border-t-4 border-red-500 font-sans">
+                    <h3 class="font-bold text-lg mb-4 text-gray-800 text-sm">⏰ 搶票預約時程</h3>
                     <div class="space-y-4">
-                        <div class="p-3 bg-gray-50 rounded-xl font-sans"><div class="flex justify-between mb-1"><span class="text-xs font-bold">Peter Luger 牛排 (3/27)</span><span class="text-[10px] bg-red-100 text-red-600 px-2 rounded">60天前</span></div><div class="flex justify-between items-end"><span class="text-sm font-bold text-red-500">約 01/26 開賣</span><a href="https://www.tablecheck.com/shops/peterluger-tokyo/reserve" target="_blank" class="text-[10px] bg-gray-800 text-white px-3 py-1.5 rounded-lg font-bold">預約</a></div></div>
+                        <div class="p-3 bg-gray-50 rounded-xl font-sans"><div class="flex justify-between mb-1"><span class="text-xs font-bold font-sans">Peter Luger 牛排 (3/27)</span><span class="text-[10px] bg-red-100 text-red-600 px-2 rounded">60天前</span></div><div class="flex justify-between items-end"><span class="text-sm font-bold text-red-500">約 01/26 開賣</span><a href="https://www.tablecheck.com/shops/peterluger-tokyo/reserve" target="_blank" class="text-[10px] bg-gray-800 text-white px-3 py-1.5 rounded-lg font-bold">預約</a></div></div>
                         <div class="p-3 bg-gray-50 rounded-xl font-sans"><div class="flex justify-between mb-1"><span class="text-xs font-bold">牛舌的檸檬 (3/25)</span><span class="text-[10px] bg-red-100 text-red-600 px-2 rounded">30天前</span></div><div class="flex justify-between items-end"><span class="text-sm font-bold text-red-500">02/23 開賣</span><a href="https://www.tablecheck.com/shops/gyutan-lemon/reserve" target="_blank" class="text-[10px] bg-gray-800 text-white px-3 py-1.5 rounded-lg font-bold">預約</a></div></div>
-                        <div class="p-3 bg-gray-50 rounded-xl font-sans"><div class="flex justify-between mb-1"><span class="text-xs font-bold">Pokemon Cafe (3/30)</span><span class="text-[10px] bg-red-100 text-red-600 px-2 rounded font-sans">31天前</span></div><div class="flex justify-between items-end"><span class="text-sm font-bold text-red-500">02/27 18:00 開賣</span><a href="https://www.pokemoncenter-online.com/cafe/reservation/" target="_blank" class="text-[10px] bg-gray-800 text-white px-3 py-1.5 rounded-lg font-bold font-sans">搶位</a></div></div>
-                        <div class="p-3 bg-gray-50 rounded-xl font-sans"><div class="flex justify-between mb-1"><span class="text-xs font-bold">富士回遊號 (3/29)</span><span class="text-[10px] bg-red-100 text-red-600 px-2 rounded font-sans">1個月前</span></div><div class="flex justify-between items-end"><span class="text-sm font-bold text-red-500">02/28 10:00 開賣</span><a href="https://www.eki-net.com/zh-CHT/jreast-train-reservation/Top/Index" target="_blank" class="text-[10px] bg-gray-800 text-white px-3 py-1.5 rounded-lg font-bold font-sans">訂票</a></div></div>
+                        <div class="p-3 bg-gray-50 rounded-xl font-sans"><div class="flex justify-between mb-1"><span class="text-xs font-bold">Pokemon Cafe (3/30)</span><span class="text-[10px] bg-red-100 text-red-600 px-2 rounded">31天前</span></div><div class="flex justify-between items-end"><span class="text-sm font-bold text-red-500">02/27 18:00 開賣</span><a href="https://www.pokemoncenter-online.com/cafe/reservation/" target="_blank" class="text-[10px] bg-gray-800 text-white px-3 py-1.5 rounded-lg font-bold">搶位</a></div></div>
+                        <div class="p-3 bg-gray-50 rounded-xl font-sans"><div class="flex justify-between mb-1"><span class="text-xs font-bold">富士回遊號 (3/29)</span><span class="text-[10px] bg-red-100 text-red-600 px-2 rounded">1個月前</span></div><div class="flex justify-between items-end"><span class="text-sm font-bold text-red-500 font-sans font-sans">02/28 10:00 開賣</span><a href="https://www.eki-net.com/zh-CHT/jreast-train-reservation/Top/Index" target="_blank" class="text-[10px] bg-gray-800 text-white px-3 py-1.5 rounded-lg font-bold">訂票</a></div></div>
                     </div>
                 </div>
-                <div class="app-card p-5">
+                <div class="app-card p-5 font-sans">
                     <h3 class="font-bold text-lg border-l-4 border-blue-500 pl-2 mb-4 uppercase tracking-tighter">航班與住宿</h3>
-                    <div class="space-y-4 text-xs text-gray-600 leading-relaxed font-sans">
-                        <p class="font-bold text-blue-600 uppercase">Scoot TR898 | 03/25 06:40 TPE ➡️ NRT</p>
-                        <p class="font-bold text-red-600 uppercase">Peach MM625 | 03/31 16:50 NRT ➡️ TPE</p>
-                        <div class="p-3 bg-gray-50 rounded-xl mt-2">
-                            <p class="font-bold text-gray-800 mb-1">🏨 VIA INN 秋葉原 (ヴィアイン秋葉原)</p>
-                            <p class="text-[10px] text-gray-500 mb-2">〒101-0041 東京都千代田区神田須田町2-19-4<br>TEL: 03-5294-5489</p>
-                            <a href="https://www.google.com/maps/search/?api=1&query=VIA+INN+Akihabara" target="_blank" class="block text-center py-2 bg-gray-900 text-white rounded-lg font-bold font-sans">📍 導航至飯店</a>
+                    <div class="space-y-3 text-xs text-gray-600 leading-relaxed font-sans">
+                        <p class="font-bold text-blue-600 font-sans">酷航 TR898 | 03/25 06:40 TPE</p>
+                        <p class="font-bold text-red-600 font-sans">樂桃 MM625 | 03/31 16:50 NRT</p>
+                        <div class="p-3 bg-gray-50 rounded-xl mt-2 font-sans font-sans">
+                            <p class="font-bold text-gray-800 mb-1 font-sans">🏨 VIA INN 秋葉原</p>
+                            <p class="text-[10px] text-gray-500 mb-2 font-sans">東京都千代田区神田須田町2-19-4<br>TEL: 03-5294-5489</p>
+                            <a href="https://www.google.com/maps/search/?api=1&query=VIA+INN+Akihabara" target="_blank" class="block text-center py-2 bg-gray-900 text-white rounded-xl font-bold font-sans">📍 導航至飯店</a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- PAGE 3: 行李與緊急救援 (內容補齊) -->
-        <section id="page-luggage" class="page font-sans">
+        <!-- PAGE 3: 清單與救援 (全面補齊) -->
+        <section id="page-luggage" class="page">
             <div class="space-y-6">
                 <!-- 緊急救援 -->
-                <div class="app-card p-5 border-t-4 border-red-500 bg-red-50/20">
+                <div class="app-card p-5 border-t-4 border-red-500 bg-red-50/20 font-sans">
                     <h3 class="font-bold text-lg mb-3 flex items-center gap-2">🆘 緊急救援支援</h3>
-                    <div class="space-y-3 text-xs leading-relaxed">
-                        <div class="p-3 bg-white rounded-xl shadow-sm"><p class="font-bold text-red-600 mb-1">【護照遺失流程】</p>1.前往警察署報案拿證明 ➡️ 2.準備大頭照2張 ➡️ 3.連繫台北駐日代表處(白金台站)。</div>
-                        <div class="p-3 bg-white rounded-xl shadow-sm"><p class="font-bold text-gray-800 mb-1">【代表處連繫電話】</p>辦公時間：03-3280-5151<br><b>24H 緊急專線：</b><span class="text-red-500 font-bold font-sans">080-6557-8796</span></div>
-                        <div class="p-3 bg-white rounded-xl shadow-sm"><p class="font-bold text-gray-800 mb-1">【外語急診醫院】</p>聖路加國際醫院(築地)：03-3541-5151<br>東京都立廣尾醫院：03-3444-1181<br>急救/火警直撥 <span class="font-bold underline text-red-600 font-sans">119</span></div>
+                    <div class="space-y-4 text-xs font-sans">
+                        <div class="p-3 bg-white rounded-xl shadow-sm leading-relaxed font-sans"><p class="font-bold text-red-600 mb-1">【護照遺失流程】</p>1.警察署報案取證明 ➡️ 2.照片2張 ➡️ 3.連繫代表處(白金台站)申請返國證明。</div>
+                        <div class="p-3 bg-white rounded-xl shadow-sm font-sans"><p class="font-bold text-gray-800 mb-1">【代表處聯繫】</p>台北駐日代表處：03-3280-5151 / <b>24H 緊急：</b><span class="text-red-500 font-bold">080-6557-8796</span></div>
+                        <div class="p-3 bg-white rounded-xl shadow-sm font-sans"><p class="font-bold text-gray-800 mb-1">【外語急診醫院】</p>聖路加國際醫院(築地) / 東京都立廣尾醫院。<br>急救直撥 <span class="font-bold underline text-red-600">119</span></div>
                     </div>
                 </div>
-                <!-- 航司注意事項 -->
-                <div class="app-card p-5 border-t-4 border-fuji-blue">
+                <!-- 航司提示 -->
+                <div class="app-card p-5 border-t-4 border-fuji-blue font-sans">
                     <h3 class="font-bold text-lg mb-3">✈️ 航司注意事項</h3>
-                    <div class="space-y-3 text-xs">
-                        <div class="p-3 bg-blue-50 rounded-xl"><p class="font-bold text-blue-700 mb-1">去程：酷航 (TR898) - 桃園 T1</p>提早 2.5hr 報到。手提 2 件限 <b>10kg</b>。鋰電池/行動電源必須手提。</div>
-                        <div class="p-3 bg-red-50 rounded-xl"><p class="font-bold text-red-700 mb-1">回程：樂桃 (MM625) - 成田 T1</p>報到櫃檯<b>準時關閉</b>(絕對不候)。手提 2 件限 <b>7kg</b> (極嚴格)。不可多件行李合併秤重。</div>
+                    <div class="space-y-3 text-xs font-sans">
+                        <div class="p-3 bg-blue-50 rounded-xl"><p class="font-bold text-blue-700 mb-1">去程：酷航 (TR898) - 桃園 T1</p>提早 2.5hr 報到。手提 2 件限 <b>10kg</b>。鋰電池必須手提。</div>
+                        <div class="p-3 bg-red-50 rounded-xl font-sans"><p class="font-bold text-red-700 mb-1">回程：樂桃 (MM625) - 成田 T1</p>報到櫃檯<b>準時關閉</b>。手提限 2 件限 <b>7kg</b> (極嚴格)。</div>
                     </div>
                 </div>
                 <!-- 行李清單 -->
-                <div class="app-card p-5 text-gray-700 font-sans">
-                    <h3 class="font-bold text-lg mb-4 font-sans font-sans">🎒 行李檢查表</h3>
-                    <div class="mb-4">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase border-b pb-1 mb-2 font-sans">重要文件</p>
-                        <div class="check-item"><input type="checkbox"> <span>護照 (效期滿6個月)</span></div>
-                        <div class="check-item"><input type="checkbox"> <span>eSIM / 日本網卡 QR Code</span></div>
-                        <div class="check-item"><input type="checkbox"> <span>旅遊平安險 / 不便險證明</span></div>
-                        <div class="check-item"><input type="checkbox"> <span>Visit Japan Web 截圖</span></div>
-                    </div>
-                    <div class="mb-4 font-sans font-sans font-sans font-sans">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase border-b pb-1 mb-2 font-sans font-sans">電器配件</p>
-                        <div class="check-item font-sans"><input type="checkbox"> <span>萬用轉接頭 & 多孔快充頭</span></div>
-                        <div class="check-item font-sans"><input type="checkbox"> <span>行動電源 (手提上機用)</span></div>
-                        <div class="check-item font-sans"><input type="checkbox"> <span>耳機 (飛機/交通用)</span></div>
-                    </div>
-                    <div class="mb-2 font-sans font-sans font-sans font-sans">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase border-b pb-1 mb-2 font-sans font-sans">生活物品</p>
-                        <div class="check-item font-sans font-sans font-sans"><input type="checkbox"> <span>個人常備藥 (止痛/胃藥)</span></div>
-                        <div class="check-item font-sans font-sans font-sans"><input type="checkbox"> <span>休足時間 / 爆走貼布</span></div>
-                        <div class="check-item font-sans font-sans font-sans"><input type="checkbox"> <span>輕便摺疊傘 / 洋蔥服裝</span></div>
-                    </div>
+                <div class="app-card p-5 font-sans">
+                    <h3 class="font-bold text-lg mb-4">🎒 行李檢查表</h3>
+                    <div class="check-item"><input type="checkbox"> <span>護照 (效期滿6個月) & eSIM</span></div>
+                    <div class="check-item"><input type="checkbox"> <span>旅遊平安險 / VJW 入境截圖</span></div>
+                    <div class="check-item"><input type="checkbox"> <span>萬用轉接頭 & 行動電源 (手提)</span></div>
+                    <div class="check-item"><input type="checkbox"> <span>常備藥 / 休足時間 / 輕便雨具</span></div>
                 </div>
             </div>
         </section>
 
-        <!-- PAGE 4: PokéPark 攻略 (根據照片深度重整) -->
-        <section id="page-pokepark" class="page font-sans">
+        <!-- PAGE 4: PokéPark 攻略 (深度整理 5 大表格) -->
+        <section id="page-pokepark" class="page">
             <div class="space-y-6">
-                <!-- 核心入園策略 -->
-                <div class="app-card p-5 border-t-8 border-pika-yellow">
-                    <h3 class="font-bold text-base mb-3 flex items-center gap-2">⚡ 攻略：08:50 抵達</h3>
+                <!-- 核心策略表 -->
+                <div class="app-card p-5 border-t-8 border-pika-yellow font-sans">
+                    <h3 class="font-bold text-base mb-3 flex items-center gap-2">⚡ 核心入園策略</h3>
                     <table class="pk-table">
                         <thead><tr><th>項目</th><th>建議 / 規定</th></tr></thead>
                         <tbody>
-                            <tr><td><b>排隊策略</b></td><td>建議 <b>08:50</b> 抵達「8 號內側排隊處」入場最快。</td></tr>
-                            <tr><td><b>開園要務</b></td><td>10:00 開園即用 APP 搶<b>親親小屋</b>與<b>商店整理券</b>。</td></tr>
-                            <tr><td><b>遊玩建議</b></td><td>整體需 8 小時。乘坐型設施排隊少，利用表演空檔玩。</td></tr>
-                            <tr><td><b>禁帶物品</b></td><td>禁止外食(包含樂園外購)、自拍棒、三腳架。</td></tr>
+                            <tr><td><b>抵達排隊</b></td><td>建議 <b>08:50</b> 抵達「8 號內側排隊處」入場最快。</td></tr>
+                            <tr><td><b>第一要務</b></td><td>入園後立刻用 <b>APP 領整理券</b> (先搶小屋與商店)。</td></tr>
+                            <tr><td><b>停留預估</b></td><td>整體建議 8 小時。森林體驗需 1.5-2 小時。</td></tr>
+                            <tr><td><b>禁帶物品</b></td><td>禁止外食(含園外購)、自拍棒、三腳架。</td></tr>
                         </tbody>
                     </table>
                 </div>
 
                 <!-- 整理券(抽票)分類 -->
-                <div class="app-card p-5">
+                <div class="app-card p-5 font-sans">
                     <h3 class="font-bold text-base mb-3 flex items-center gap-2">🎫 整理券抽票中心</h3>
-                    <table class="pk-table">
-                        <thead><tr><th>項目</th><th>方式</th><th>規則備註</th></tr></thead>
+                    <table class="pk-table font-sans">
+                        <thead><tr><th>設施</th><th>方式</th><th>備註</th></tr></thead>
                         <tbody>
-                            <tr><td><b>親親寶可夢小屋</b></td><td class="text-red-500 font-bold">先到先得</td><td>極速秒殺。只限拍一個 cut，可請員工拍片。</td></tr>
-                            <tr><td><b>商店入場券</b></td><td class="text-red-500 font-bold">先到先得</td><td>限入店一次，<b>結帳後不可再回頭入內</b>。</td></tr>
-                            <tr><td><b>皮卡丘電光秀</b></td><td class="text-blue-500 font-bold">APP 抽籤</td><td>一天 4 場。表演中禁拍，結尾有攝影時間。</td></tr>
-                            <tr><td><b>草紗道館秀</b></td><td class="text-blue-500 font-bold">APP 抽籤</td><td>一天 4 場。依行程空檔手動點選抽籤。</td></tr>
+                            <tr><td><b>親親小屋</b></td><td class="text-red-500 font-bold">先到先得</td><td>極速秒殺。只限拍一個 cut，可請員工拍片。</td></tr>
+                            <tr><td><b>商店入場券</b></td><td class="text-red-500 font-bold">先到先得</td><td>限進場一次，<b>結帳後即不可再入</b>。</td></tr>
+                            <tr><td><b>皮卡丘電光秀</b></td><td class="text-blue-500 font-bold">APP 抽籤</td><td>正式表演禁拍。結尾有攝影時間。</td></tr>
+                            <tr><td><b>草紗道館秀</b></td><td class="text-blue-500 font-bold">APP 抽籤</td><td>一天 4 場。依行程空檔手動點選。</td></tr>
                         </tbody>
                     </table>
                 </div>
 
-                <!-- 設施與區域指南 -->
-                <div class="app-card p-5 border-l-8 border-fuji-blue">
-                    <h3 class="font-bold text-base mb-3">🏘️ 設施與區域亮點</h3>
+                <!-- 區域指南 -->
+                <div class="app-card p-5 font-sans">
+                    <h3 class="font-bold text-base mb-3">🏘️ 分區設施指南</h3>
                     <table class="pk-table">
-                        <thead><tr><th>設施 / 區域</th><th>特色亮點</th></tr></thead>
+                        <thead><tr><th>區域</th><th>特色亮點</th></tr></thead>
                         <tbody>
-                            <tr><td><b>皮卡丘大派對</b></td><td>電屬性設施，30 多隻寶可夢努力發電。</td></tr>
-                            <tr><td><b>布伊布伊布步遊</b></td><td>伊布旋轉木馬。設施座椅有皮卡丘尾巴細節。</td></tr>
-                            <tr><td><b>寶可夢森林</b></td><td>500米長自然地形。與快龍、耿鬼互動。需<b>耐髒鞋</b>。</td></tr>
-                            <tr><td><b>喵喵小屋</b></td><td>寶可夢卡框拍照遊戲、套圈圈挑戰 (獲貼紙)。</td></tr>
+                            <tr><td><b>草紗鎮</b></td><td>皮卡丘大派對(發電設施)、伊布木馬(尾巴細節)。</td></tr>
+                            <tr><td><b>寶可夢森林</b></td><td>500米地形體驗。快龍、耿鬼等。需穿<b>耐髒鞋</b>。</td></tr>
+                            <tr><td><b>活動攤位</b></td><td>喵喵小屋：卡框拍照與套圈圈遊戲。</td></tr>
                         </tbody>
                     </table>
                 </div>
 
-                <!-- 美食與限定品 -->
-                <div class="app-card p-5 border-l-8 border-pika-yellow">
-                    <h3 class="font-bold text-base mb-3">🍱 必買美食與商品</h3>
+                <!-- 美食清單 -->
+                <div class="app-card p-5">
+                    <h3 class="font-bold text-base mb-3">🍱 必買美食</h3>
                     <table class="pk-table">
                         <thead><tr><th>類別</th><th>推薦項目</th></tr></thead>
                         <tbody>
-                            <tr><td><b>高人氣商品</b></td><td>關都 151 種隨機球別針 (排隊長，限購一)。</td></tr>
-                            <tr><td><b>美食首選</b></td><td>卡比獸爆米花桶 (¥4500 附吹笛可叫醒卡比獸)。</td></tr>
-                            <tr><td><b>拍照甜點</b></td><td>伊布造型拉花拿鐵、角色造型冰棒 (鳳梨/巧克力)。</td></tr>
-                            <tr><td><b>主食推薦</b></td><td>皮卡丘表情飯糰 (五種隨機表情)，附竹炭炸雞。</td></tr>
+                            <tr><td>熱門美食</td><td>卡比獸爆米花桶 (¥4500 附吹笛)、皮卡丘飯糰。</td></tr>
+                            <tr><td>甜點飲品</td><td>伊布造型拉花拿鐵、角色造型冰棒 (鳳梨/巧克力)。</td></tr>
                         </tbody>
                     </table>
                 </div>
 
                 <!-- 隱藏點 (淺色底) -->
-                <div class="app-card p-5 bg-slate-50 border border-slate-200">
-                    <h3 class="font-bold text-base mb-3 text-amber-500 uppercase tracking-widest font-sans font-sans">Secret Spots</h3>
+                <div class="app-card p-5 bg-slate-50 border border-slate-200 font-sans">
+                    <h3 class="font-bold text-base mb-4 text-amber-500 uppercase tracking-widest font-sans">Secret Spots</h3>
                     <table class="pk-table">
-                        <thead class="bg-slate-200/50"><tr><th>隱藏地點</th><th>內容細節</th></tr></thead>
+                        <thead class="bg-slate-200/50"><tr><th>隱藏地點</th><th>具體位置與內容</th></tr></thead>
                         <tbody class="text-gray-700">
-                            <tr><td><b>實體對戰場</b></td><td>位於「草紗道館」後方。震撼實體 2 對 2 對決。</td></tr>
-                            <tr><td><b>限定人孔蓋</b></td><td>位於「伊布旋轉木馬」附近。皮卡布泡泡設計。</td></tr>
+                            <tr><td><b>實體對戰場</b></td><td>「草紗道館」後方。震撼實體 2 對 2 對決。</td></tr>
+                            <tr><td><b>人孔蓋</b></td><td>「伊布旋轉木馬」附近。泡泡嘉年華限定設計。</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -225,107 +191,129 @@
         <!-- PAGE 5: 帳本 (4 人制) -->
         <section id="page-ledger" class="page">
             <div class="app-card p-5 mb-6 bg-slate-900 text-white shadow-xl">
-                <h3 class="font-bold opacity-80 mb-4 text-center text-xs tracking-widest uppercase">結算總覽 (獨立紀錄)</h3>
-                <div class="grid grid-cols-2 gap-4 text-center font-sans">
-                    <div class="pb-2 border-b border-white/10"><p class="text-[10px] font-bold opacity-50 mb-1 uppercase font-sans">P</p><p id="sum-jpy-P" class="font-mono text-[11px] text-fuji-blue font-bold font-sans">¥ 0</p><p id="sum-twd-P" class="font-mono text-[11px] text-sakura font-bold font-sans font-sans">$ 0</p></div>
-                    <div class="pb-2 border-b border-white/10"><p class="text-[10px] font-bold opacity-50 mb-1 uppercase font-sans">羊</p><p id="sum-jpy-羊" class="font-mono text-[11px] text-fuji-blue font-bold font-sans">¥ 0</p><p id="sum-twd-羊" class="font-mono text-[11px] text-sakura font-bold font-sans font-sans">$ 0</p></div>
-                    <div class="font-sans"><p class="text-[10px] font-bold opacity-50 mb-1 font-sans">威倫</p><p id="sum-jpy-威倫" class="font-mono text-[11px] text-fuji-blue font-bold font-sans">¥ 0</p><p id="sum-twd-威倫" class="font-mono text-[11px] text-sakura font-bold font-sans font-sans">$ 0</p></div>
-                    <div class="font-sans font-sans"><p class="text-[10px] font-bold opacity-50 mb-1 font-sans font-sans">陳岱</p><p id="sum-jpy-陳岱" class="font-mono text-[11px] text-fuji-blue font-bold font-sans font-sans">¥ 0</p><p id="sum-twd-陳岱" class="font-mono text-[11px] text-sakura font-bold font-sans font-sans font-sans">$ 0</p></div>
+                <h3 class="font-bold opacity-80 mb-4 text-center text-xs tracking-widest uppercase font-sans font-sans">結算總覽 (獨立紀錄)</h3>
+                <div class="grid grid-cols-2 gap-4 text-center font-sans font-sans font-sans font-sans font-sans">
+                    <div class="pb-2 border-b border-white/10 font-sans font-sans font-sans font-sans font-sans font-sans font-sans"><p class="text-[10px] font-bold opacity-50 mb-1 uppercase font-sans font-sans font-sans">P</p><p id="sum-jpy-P" class="font-mono text-[11px] text-fuji-blue font-bold">¥ 0</p><p id="sum-twd-P" class="font-mono text-[11px] text-sakura font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">$ 0</p></div>
+                    <div class="pb-2 border-b border-white/10 font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"><p class="text-[10px] font-bold opacity-50 mb-1 uppercase font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">羊</p><p id="sum-jpy-羊" class="font-mono text-[11px] text-fuji-blue font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans">¥ 0</p><p id="sum-twd-羊" class="font-mono text-[11px] text-sakura font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">$ 0</p></div>
+                    <div class="font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"><p class="text-[10px] font-bold opacity-50 mb-1 font-sans font-sans font-sans font-sans">威倫</p><p id="sum-jpy-威倫" class="font-mono text-[11px] text-fuji-blue font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">¥ 0</p><p id="sum-twd-威倫" class="font-mono text-[11px] text-sakura font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">$ 0</p></div>
+                    <div class="font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"><p class="text-[10px] font-bold opacity-50 mb-1 font-sans font-sans font-sans font-sans">陳岱</p><p id="sum-jpy-陳岱" class="font-mono text-[11px] text-fuji-blue font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">¥ 0</p><p id="sum-twd-陳岱" class="font-mono text-[11px] text-sakura font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">$ 0</p></div>
                 </div>
             </div>
-            <div class="app-card p-5 mb-6 font-sans font-sans">
-                <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-sm">記一筆支出</h3><div class="flex bg-gray-100 rounded-lg p-1 gap-1"><button onclick="setCurrency('JPY')" id="cur-JPY" class="currency-btn px-4 py-1 rounded-md text-[10px] font-sans">JPY</button><button onclick="setCurrency('TWD')" id="cur-TWD" class="currency-btn px-4 py-1 rounded-md text-[10px] font-sans">TWD</button></div></div>
+            <div class="app-card p-5 mb-6 font-sans font-sans font-sans font-sans font-sans">
+                <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-sm font-sans font-sans">記一筆支出</h3><div class="flex bg-gray-100 rounded-lg p-1 gap-1"><button onclick="setCurrency('JPY')" id="cur-JPY" class="currency-btn px-4 py-1 rounded-md text-[10px] font-sans">JPY</button><button onclick="setCurrency('TWD')" id="cur-TWD" class="currency-btn px-4 py-1 rounded-md text-[10px] font-sans">TWD</button></div></div>
                 <div class="space-y-4">
-                    <input type="text" id="exp-name" placeholder="項目名稱" class="input-field font-sans">
-                    <input type="number" id="exp-total" placeholder="金額" class="input-field font-mono font-sans">
+                    <input type="text" id="exp-name" placeholder="項目名稱" class="input-field font-sans font-sans font-sans font-sans">
+                    <input type="number" id="exp-total" placeholder="金額" class="input-field font-mono font-sans font-sans font-sans font-sans font-sans font-sans">
                     <div class="grid grid-cols-4 gap-1">
-                        <button onclick="setPayer('P')" id="payer-P" class="payer-btn py-2 rounded-xl text-[10px] font-sans font-sans">P</button>
-                        <button onclick="setPayer('羊')" id="payer-羊" class="payer-btn py-2 rounded-xl text-[10px] font-sans font-sans">羊</button>
-                        <button onclick="setPayer('威倫')" id="payer-威倫" class="payer-btn py-2 rounded-xl text-[10px] font-sans font-sans">威倫</button>
-                        <button onclick="setPayer('陳岱')" id="payer-陳岱" class="payer-btn py-2 rounded-xl text-[10px] font-sans font-sans">陳岱</button>
+                        <button onclick="setPayer('P')" id="payer-P" class="payer-btn py-2 rounded-xl text-[10px] font-sans font-sans font-sans font-sans font-sans font-sans font-sans">P</button>
+                        <button onclick="setPayer('羊')" id="payer-羊" class="payer-btn py-2 rounded-xl text-[10px] font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">羊</button>
+                        <button onclick="setPayer('威倫')" id="payer-威倫" class="payer-btn py-2 rounded-xl text-[10px] font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">威倫</button>
+                        <button onclick="setPayer('陳岱')" id="payer-陳岱" class="payer-btn py-2 rounded-xl text-[10px] font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">陳岱</button>
                     </div>
-                    <button onclick="addExpense()" class="w-full bg-gray-900 text-white py-3 rounded-xl font-bold text-sm click-effect shadow-lg uppercase tracking-widest font-sans font-sans">新增紀錄</button>
+                    <button onclick="addExpense()" class="w-full bg-gray-900 text-white py-3 rounded-xl font-bold text-sm click-effect shadow-lg uppercase tracking-widest font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">新增紀錄</button>
                 </div>
             </div>
-            <div id="expense-list" class="space-y-3 font-sans font-sans"></div>
+            <div id="expense-list" class="space-y-3 font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"></div>
         </section>
     </main>
 
     <!-- Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-100 px-2 py-3 flex justify-between items-center z-50 font-sans">
-        <button onclick="switchPage('schedule')" id="nav-item-schedule" class="flex flex-col items-center gap-1 nav-active transition-all flex-1 font-sans font-sans"><span class="text-xl">🗓️</span><span class="text-[9px] font-bold font-sans">行程</span></button>
-        <button onclick="switchPage('tools')" id="nav-item-tools" class="flex flex-col items-center gap-1 nav-inactive transition-all flex-1 font-sans font-sans"><span class="text-xl">⏰</span><span class="text-[9px] font-bold font-sans">預約</span></button>
-        <button onclick="switchPage('pokepark')" id="nav-item-pokepark" class="flex flex-col items-center gap-1 nav-inactive transition-all flex-1 font-sans font-sans"><span class="text-xl">🐾</span><span class="text-[9px] font-bold text-amber-600 font-sans">Poképark</span></button>
-        <button onclick="switchPage('luggage')" id="nav-item-luggage" class="flex flex-col items-center gap-1 nav-inactive transition-all flex-1 font-sans font-sans"><span class="text-xl">🎒</span><span class="text-[9px] font-bold font-sans">清單</span></button>
-        <button onclick="switchPage('ledger')" id="nav-item-ledger" class="flex flex-col items-center gap-1 nav-inactive transition-all flex-1 font-sans font-sans"><span class="text-xl">💰</span><span class="text-[9px] font-bold font-sans">帳本</span></button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-100 px-4 py-3 flex justify-between items-center z-50 font-sans font-sans font-sans font-sans">
+        <button onclick="switchPage('schedule')" id="nav-item-schedule" class="flex flex-col items-center gap-1 nav-active transition-all flex-1 font-sans font-sans font-sans font-sans"><span class="text-xl">🗓️</span><span class="text-[9px] font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">行程</span></button>
+        <button onclick="switchPage('tools')" id="nav-item-tools" class="flex flex-col items-center gap-1 nav-inactive transition-all flex-1 font-sans font-sans font-sans font-sans font-sans"><span class="text-xl">⏰</span><span class="text-[9px] font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans">預約</span></button>
+        <button onclick="switchPage('pokepark')" id="nav-item-pokepark" class="flex flex-col items-center gap-1 nav-inactive transition-all flex-1 font-sans font-sans font-sans font-sans font-sans font-sans"><span class="text-xl">🐾</span><span class="text-[9px] font-bold text-amber-600 uppercase font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">Poképark</span></button>
+        <button onclick="switchPage('luggage')" id="nav-item-luggage" class="flex flex-col items-center gap-1 nav-inactive transition-all flex-1 font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"><span class="text-xl">🎒</span><span class="text-[9px] font-bold uppercase font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">清單</span></button>
+        <button onclick="switchPage('ledger')" id="nav-item-ledger" class="flex flex-col items-center gap-1 nav-inactive transition-all flex-1 font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"><span class="text-xl">💰</span><span class="text-[9px] font-bold uppercase font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">帳本</span></button>
     </nav>
 
     <script>
         const tripData = [
             { day: 1, date: "03/25 WED", events: [
-                { time: "06:40", type: "trans", title: "桃園 T1 出發 (TR898)", note: "預計 10:45 抵達 NRT T2", nav: "TPE" },
-                { type: "route", desc: "搭乘 Skyliner (11:58發) ➡️ 日暮里轉 JR ➡️ 秋葉原站", time: "75 分鐘" },
-                { time: "13:30", type: "hotel", title: "VIA INN 秋葉原寄行李", note: "飯店先放下重物", nav: "VIA INN Akihabara" },
-                { type: "route", desc: "JR ➡️ 新宿站", time: "20 分鐘" },
-                { time: "15:00", type: "eat", title: "Eggslut Shinjuku", note: "推薦 Fairfax Sandwich", nav: "Eggslut Shinjuku" },
+                { time: "06:40", type: "trans", title: "桃園 T1 出發 (TR898)", note: "預計 10:45 抵達 NRT T2", nav: "Taoyuan Airport Terminal 1" },
+                { time: "11:42", type: "trans", title: "抵達一航 & 搭乘 Skyliner", note: "班次選擇 : 11:42 / 12:02 / 12:22", transit: [
+                    { icon: "🚆", label: "[Skyliner]", desc: "成田機場第 1 航廈 ➡️ 日暮里站 (過 1 站)", time: "36 MIN" },
+                    { icon: "🚶", label: "日暮里站 (South Gate) 轉乘", time: "3 MIN" },
+                    { icon: "🚆", label: "[JY 山手線]", desc: "日暮里站 ➡️ 秋葉原站 (過 4 站)", sub: "🚉 10 號月台  💰 ¥2766", time: "7 MIN" },
+                    { icon: "🚶", label: "步行至住宿地點", sub: "Central South Exit", time: "7 MIN" }
+                ], nav: "Narita Airport Terminal 1" },
+                { time: "13:30", type: "hotel", title: "住宿寄放行李 & 出發前往新宿", note: "寄放完行李後立即出發前往新宿用餐", transit: [{ icon: "🚆", label: "[JB 中央總武線]", desc: "秋葉原站 ➡️ 新宿站", sub: "🚉 5 號月台  🚪 Odakyu South Exit  💰 ¥209", time: "30 MIN" }], nav: "VIA INN Akihabara" },
+                { time: "14:00", type: "eat", title: "午餐 : eggslut 蛋漢堡", tip: "💡 新宿站 Odakyu South Exit 出站即達", nav: "eggslut Shinjuku" },
                 { time: "16:30", type: "buy", title: "新宿伊勢丹 & 治一郎", note: "B1 買布丁", nav: "Isetan Shinjuku" },
-                { time: "18:00", type: "eat", title: "ジャズ喫茶＆バー「DUG」", note: "昭和咖啡吧氛圍", nav: "Jazz Cafe DUG" },
-                { time: "20:00", type: "eat", title: "牛舌的檸檬", note: "新宿最紅牛舌 (已預約)", nav: "Gyutan no Lemon Shinjuku" }
+                { time: "18:00", type: "eat", title: "休息 : ジャズ喫茶＆バー「DUG」", nav: "Jazz Cafe DUG" },
+                { time: "20:00", type: "eat", title: "晚餐 : 牛舌的檸檬", note: "新宿厚切牛舌 (已預約)", nav: "Gyutan no Lemon Shinjuku" },
+                { time: "22:00", type: "hotel", title: "回飯店休息", transit: [{ icon: "🚆", label: "[JB 中央總武線]", desc: "新宿 ➡️ 秋葉原", sub: "🚉 13 號月台  💰 ¥209", time: "20 MIN" }], nav: "VIA INN Akihabara" }
             ]},
             { day: 2, date: "03/26 THU", events: [
-                { time: "09:00", type: "hotel", title: "VIA INN 秋葉原 出發", note: "飯店開始今日行程", nav: "VIA INN Akihabara" },
-                { type: "route", desc: "搭乘 JR ➡️ 王子站", time: "25 分鐘" },
-                { time: "09:30", type: "spot", title: "王子神社 & 妙義神社", note: "古老神社巡禮", nav: "Oji Shrine" },
-                { type: "route", desc: "搭乘 JR ➡️ 神田站", time: "25 分鐘" },
-                { time: "11:00", type: "eat", title: "鰻の成瀬 神田店", note: "高CP值鰻魚飯 (已預約)", nav: "鰻の成瀬 神田店" },
-                { type: "route", desc: "搭乘 JR ➡️ 池袋站", time: "25 分鐘" },
-                { time: "13:30", type: "buy", title: "Pokemon Mega Tokyo", note: "池袋太陽城購物", nav: "Pokemon Center Mega Tokyo" },
-                { time: "15:30", type: "eat", title: "Pikachu Sweets", note: "必買寶可夢甜點", nav: "Pikachu Sweets" },
-                { time: "20:30", type: "hotel", title: "返回 VIA INN 秋葉原", note: "休息", nav: "VIA INN Akihabara" }
+                { time: "09:00", type: "hotel", title: "出門 & 秋葉原站「酪」牛奶", note: "推薦前往 6 號月台 Milk Stand 喝限定牛奶。", transit: [{ icon: "🚶", label: "步行至秋葉原站", time: "5 MIN" }], tip: "💡 推薦：酪王咖啡牛奶", nav: "Milk Stand Akihabara Station" },
+                { time: "09:30", type: "buy", title: "秋葉原逛街：Yodobashi-Akiba", tip: "💡 09:30 開門", nav: "Yodobashi Akiba" },
+                { time: "10:00", type: "buy", title: "玩具店備案 (早上有開)", note: "無線電會館 10:00開、駿河屋 11:00開。", nav: "Akihabara Radio Kaikan" },
+                { time: "10:45", type: "trans", title: "前往午餐：鰻の成瀬", transit: [{ icon: "🚶", label: "步行至神田明神方向", time: "12 MIN" }], nav: "鰻の成瀬 神田明神店" },
+                { time: "11:00", type: "eat", title: "午餐：鰻の成瀬 神田明神店", tip: "💡 已預約 11:00", nav: "鰻の成瀬 神田明神店" },
+                { time: "12:30", type: "trans", title: "前往池袋", transit: [{ icon: "🚶", label: "步行至御茶之水站", time: "8 MIN" }, { icon: "🚆", label: "[M 丸之內線]", desc: "御茶之水 ➡️ 池袋", sub: "💰 ¥209", time: "12 MIN" }], nav: "Ikebukuro Station" },
+                { time: "12:50", type: "buy", title: "東武百貨 (Tobu) 逛街 & 領券", tip: "💡 記得領 95% 優惠券", nav: "Tobu Department Store Ikebukuro" },
+                { time: "13:50", type: "buy", title: "池袋 PARCO (預約/抽券)", nav: "Ikebukuro PARCO" },
+                { time: "14:20", type: "buy", title: "池袋太陽城：寶可夢中心 & 逛街", note: "B1 吉伊卡哇 / 2F 寶可夢 / 3F 扭蛋", nav: "Sunshine City" },
+                { time: "17:00", type: "buy", title: "Animate 池袋本店", nav: "Animate Ikebukuro" },
+                { time: "19:30", type: "eat", title: "晚餐：池袋區域 (多樣備案)", nav: "Ikebukuro Station" },
+                { time: "21:00", type: "buy", title: "唐吉訶德 池袋東口店", nav: "Don Quijote Ikebukuro" },
+                { time: "23:00", type: "hotel", title: "返回飯店休息", transit: [{ icon: "🚆", label: "[JY 山手線]", desc: "池袋 ➡️ 秋葉原", sub: "💰 ¥209", time: "30 MIN" }], nav: "VIA INN Akihabara" }
             ]},
             { day: 3, date: "03/27 FRI", events: [
-                { time: "09:00", type: "hotel", title: "VIA INN 秋葉原 出發", note: "前往豪德寺區", nav: "VIA INN Akihabara" },
-                { type: "route", desc: "JR ➡️ 新宿 ➡️ 小田急 ➡️ 豪德寺站", time: "45 分鐘" },
-                { time: "10:30", type: "spot", title: "豪德寺 (招財貓)", note: "震撼貓牆 (16:30關)", nav: "Gotokuji Temple" },
-                { type: "route", desc: "小田急 ➡️ 明治神宮前 (原宿)", time: "30 分鐘" },
-                { time: "14:30", type: "buy", title: "原宿 Poppy / kinetics", note: "潮流巡禮", nav: "Poppy Tokyo" },
-                { type: "route", desc: "步行 ➡️ 澀谷 PARCO", time: "15 分鐘" },
-                { time: "17:30", type: "buy", title: "tar 渋谷店 / 1:1超夢", note: "澀谷打卡點", nav: "tar Shibuya" },
-                { type: "route", desc: "JR ➡️ 惠比壽站", time: "15 分鐘" },
-                { time: "19:45", type: "eat", title: "Peter Luger 牛排", note: "已預約 (120分鐘)", nav: "Peter Luger" },
-                { time: "22:00", type: "hotel", title: "返回 VIA INN 秋葉原", note: "休息", nav: "VIA INN Akihabara" }
+                { time: "08:00", type: "trans", title: "從飯店出發前往豪德寺", transit: [{ icon: "🚶", label: "住宿飯店 ➡️ 秋葉原站", time: "5 MIN" }, { icon: "🚆", label: "[JB 中央總武線]", desc: "秋葉原站 ➡️ 新宿站", sub: "💰 ¥209", time: "20 MIN" }, { icon: "🚆", label: "[小田急線]", desc: "新宿站 ➡️ 豪德寺站", sub: "💰 ¥200", time: "15 MIN" }, { icon: "🚶", label: "豪德寺站 ➡️ 豪德寺", time: "10 MIN" }], nav: "Gotokuji Temple" },
+                { time: "09:00", type: "spot", title: "豪德寺 (Gotokuji Temple)", note: "以招財貓聞名的寺廟。", nav: "Gotokuji Temple" },
+                { time: "10:00", type: "eat", title: "RARASAND 豪德寺店 (雞蛋糕)", tip: "💡 不定期公休", nav: "RARASAND Gotokuji" },
+                { time: "10:30", type: "eat", title: "IRON COFFEE 經堂", nav: "IRON COFFEE Kyodo" },
+                { time: "11:30", type: "spot", title: "高圓寺 (Koenji) 逛街 & 午餐", transit: [{ icon: "🚆", label: "[JR 中央線]", time: "15 MIN" }], nav: "Koenji Station" },
+                { time: "14:00", type: "spot", title: "中野百老匯 (Nakano Broadway)", tip: "💡 Mandarake 總店所在地", nav: "Nakano Broadway" },
+                { time: "16:30", type: "trans", title: "前往六本木", transit: [{ icon: "🚆", label: "[都營大江戶線]", time: "20 MIN" }], nav: "Roppongi Station" },
+                { time: "17:30", type: "spot", title: "六本木賞櫻 : 毛利庭園", nav: "Mohri Garden" },
+                { time: "18:30", type: "spot", title: "六本木之丘 (City View)", nav: "Roppongi Hills Mori Tower" },
+                { time: "20:00", type: "eat", title: "晚餐 : 敘敘苑 六本木店", nav: "Jojoen Roppongi" },
+                { time: "21:00", type: "hotel", title: "返回秋葉原飯店", transit: [{ icon: "🚆", label: "[H 日比谷線]", desc: "六本木 ➡️ 秋葉原", sub: "💰 ¥210", time: "22 MIN" }], nav: "VIA INN Akihabara" }
             ]},
             { day: 4, date: "03/28 SAT", events: [
-                { time: "08:30", type: "hotel", title: "VIA INN 秋葉原 出發", note: "前往讀賣樂園", nav: "VIA INN Akihabara" },
-                { type: "route", desc: "JR ➡️ 新宿 ➡️ 京王 ➡️ 讀賣樂園站", time: "60 分鐘" },
-                { time: "10:00", type: "spot", title: "PokéPark KANTO", note: "詳見攻略分頁", nav: "Yomiuriland" },
-                { type: "route", desc: "JR ➡️ 惠比壽", time: "55 分鐘" },
-                { time: "19:30", type: "eat", title: "肉燒屋 D-29 燒肉", note: "和牛專家私房店", nav: "Nikuyakiya D-29" },
-                { time: "21:30", type: "hotel", title: "返回 VIA INN 秋葉原", note: "休息", nav: "VIA INN Akihabara" }
+                { time: "07:15", type: "hotel", title: "出發前往 PokéPark Kanto", transit: [{ icon: "🚆", label: "[JB 中央總武線]", desc: "秋葉原 ➡️ 新宿", sub: "💰 ¥209", time: "20 MIN" }, { icon: "🚆", label: "[京王線]", desc: "新宿 ➡️ 讀賣樂園站", sub: "💰 ¥300", time: "30 MIN" }, { icon: "🚠", label: "[空中纜車]", sub: "💰 ¥300", time: "5 MIN" }], nav: "Yomiuriland" },
+                { time: "08:30", type: "spot", title: "抵達讀賣樂園排隊", note: "目標前 60-100 人", nav: "Yomiuriland" },
+                { time: "10:00", type: "spot", title: "入園 : PokéPark Kanto", tip: "💡 威倫門票時間為 12:00", nav: "Yomiuriland" },
+                { time: "10:20", type: "spot", title: "草紗鎮 (Grassland Town) 探索", note: "喬伊小姐、151 胸針。", nav: "Yomiuriland" },
+                { time: "11:00", type: "buy", title: "寶可夢中心 (Pokémon Center)", nav: "Yomiuriland" },
+                { time: "12:00", type: "eat", title: "午餐 : 七夕青鳥羽棲廚房", nav: "Yomiuriland" },
+                { time: "13:00", type: "spot", title: "皮卡皮卡電光閃閃表演", nav: "Yomiuriland" },
+                { time: "15:30", type: "spot", title: "探索 : 寶可夢森林", nav: "Yomiuriland" },
+                { time: "17:30", type: "trans", title: "前往千鳥之淵賞夜櫻", transit: [{ icon: "🚆", label: "[都營新宿線]", desc: "新宿 ➡️ 九段下", sub: "💰 ¥180", time: "10 MIN" }], nav: "Chidorigafuchi Park" },
+                { time: "18:30", type: "spot", title: "千鳥之淵 賞夜櫻", tip: "💡 建議停留 1 小時", nav: "Chidorigafuchi Park" },
+                { time: "19:30", type: "spot", title: "東京都廳光雕投影秀", note: "19:30 寶可夢 / 20:00 哥吉拉", nav: "Tokyo Metropolitan Government Building" },
+                { time: "20:30", type: "eat", title: "晚餐/宵夜 : 新宿思出橫丁", nav: "Omoide Yokocho" },
+                { time: "22:30", type: "hotel", title: "返回秋葉原飯店", transit: [{ icon: "🚆", label: "[JB 中央總武線]", desc: "新宿 ➡️ 秋葉原", sub: "💰 ¥210", time: "20 MIN" }], nav: "VIA INN Akihabara" }
             ]},
             { day: 5, date: "03/29 SUN", events: [
-                { time: "08:30", type: "hotel", title: "VIA INN 秋葉原 出發", note: "新宿車站搭特急", nav: "VIA INN Akihabara" },
-                { type: "route", desc: "JR ➡️ 新宿 (搭乘 09:30 富士回遊)", time: "25 分鐘" },
-                { time: "11:30", type: "spot", title: "新倉山淺草公園", note: "經典富士景 (<a href='https://fuji-san.info/zh-tw/index.html' target='_blank' class='text-blue-500 underline font-sans'>能見度</a>)", nav: "Chureito Pagoda" },
-                { time: "14:30", type: "spot", title: "富士御室神社 / 大石公園", note: "欣賞富士夕陽", nav: "Oishi Park" },
-                { time: "20:30", type: "hotel", title: "返回 VIA INN 秋葉原", note: "休息", nav: "VIA INN Akihabara" }
+                { time: "08:00", type: "trans", title: "包車出發：前往富士山區域", note: "飯店接送", transit: [{ icon: "👥", label: "秋葉原 ➡️ 富士五湖", time: "2 HOURS" }], nav: "Fuji Five Lakes" },
+                { time: "10:00", type: "spot", title: "新倉山淺草公園 (忠靈塔)", tip: "💡 必轉限定扭蛋", nav: "Chureito Pagoda" },
+                { time: "11:45", type: "spot", title: "河口湖 產屋崎 (Ubuyagasaki)", nav: "Ubuyagasaki" },
+                { time: "12:30", type: "eat", title: "午餐：餺飥不動 (東戀路店)", nav: "Houtou Fudou Higashikoiguchi" },
+                { time: "14:00", type: "spot", title: "山中湖 親水公園", tip: "💡 the park 咖啡旁", nav: "Yamanakako Oyami Park" },
+                { time: "15:00", type: "spot", title: "山中湖交流廣場 きらら", nav: "Yamanakako Communication Center Kirara" },
+                { time: "16:15", type: "spot", title: "明神山全景台", nav: "Yamanakako Panorama Dai" },
+                { time: "19:30", type: "eat", title: "晚餐：根室花丸 銀座店", nav: "Nemuro Hanamaru Ginza" },
+                { time: "21:00", type: "trans", title: "前往港區 (東京鐵塔夜景)", transit: [{ icon: "🚆", label: "【H 日比谷線】銀座 ➡️ 神谷町", sub: "💰 ¥180", time: "10 MIN" }], nav: "Kamiyacho Station" },
+                { time: "21:15", type: "spot", title: "東京鐵塔夜景巡禮", nav: "Tokyo Tower" },
+                { time: "22:30", type: "hotel", title: "返回秋葉原飯店", transit: [{ icon: "🚆", label: "三田 ➡️ 秋葉原", sub: "💰 ¥300", time: "20 MIN" }], nav: "VIA INN Akihabara" }
             ]},
             { day: 6, date: "03/30 MON", events: [
-                { time: "09:00", type: "hotel", title: "VIA INN 秋葉原 出發", note: "今日行程開始", nav: "VIA INN Akihabara" },
-                { time: "13:30", type: "eat", title: "Soup Curry Dominica", note: "札幌湯咖哩名店", nav: "Dominica" },
-                { time: "15:30", type: "eat", title: "Pokemon Cafe / DX", note: "預約制 (<a href='https://digital-stamprally.jp/web/793' target='_blank' class='text-blue-500 underline font-sans'>集章活動連結</a>)", nav: "Pokemon DX" },
-                { time: "18:30", type: "eat", title: "根室花丸 銀座", note: "北海道壽司 (需先抽號)", nav: "Nemuro" },
-                { time: "20:30", type: "spot", title: "東京鐵塔投影秀", note: "Spring Concerto 櫻花投影秀", nav: "Tokyo Tower" },
-                { time: "22:00", type: "hotel", title: "返回 VIA INN 秋葉原", note: "休息", nav: "VIA INN Akihabara" }
+                { time: "09:00", type: "hotel", title: "VIA INN 秋葉原 出發", nav: "VIA INN Akihabara" },
+                { time: "13:30", type: "eat", title: "Soup Curry Dominica", nav: "Sapporo Soup Curry Tokyo Dominica" },
+                { time: "15:30", type: "eat", title: "Pokemon Cafe / DX", note: "預約制 (<a href='https://digital-stamprally.jp/web/793' target='_blank'>集章活動</a>)", nav: "Pokemon Center Tokyo DX" },
+                { time: "18:30", type: "eat", title: "根室花丸 銀座店", nav: "Nemuro Hanamaru Ginza" },
+                { time: "20:30", type: "spot", title: "東京鐵塔投影秀", nav: "Tokyo Tower" },
+                { time: "22:00", type: "hotel", title: "返回秋葉原飯店休息", nav: "VIA INN Akihabara" }
             ]},
             { day: 7, date: "03/31 TUE", events: [
-                { time: "09:00", type: "hotel", title: "VIA INN 秋葉原 退房", note: "辦理退房並寄行李", nav: "VIA INN Akihabara" },
-                { type: "route", desc: "JR ➡️ 上野站", time: "5 分鐘" },
-                { time: "10:00", type: "buy", title: "Yamashiroya 玩具店", note: "站前 7 層樓天堂", nav: "Yamashiroya" },
-                { time: "11:30", type: "buy", title: "阿美橫丁最後採買", note: "最後午餐與買藥妝", nav: "Ameyoko" },
-                { type: "route", desc: "Skyliner ➡️ 成田", time: "60 分鐘" },
-                { time: "13:40", type: "trans", title: "前往成田機場 T1", note: "預計 14:30 抵達", nav: "Keisei Ueno" },
-                { time: "16:50", type: "trans", title: "成田 T1 返台 (MM625)", note: "樂桃航空 MM625", nav: "Narita Airport T1" }
+                { time: "09:00", type: "hotel", title: "秋葉原最後補貨 & 退房", note: "松本清、唐吉、Yodobashi。", nav: "Matsumoto Kiyoshi" },
+                { time: "10:00", type: "buy", title: "Yamashiroya 玩具店", nav: "Yamashiroya" },
+                { time: "11:30", type: "buy", title: "阿美橫丁最後補貨", nav: "Ameyoko Market" },
+                { time: "12:30", type: "hotel", title: "回飯店拿行李", nav: "VIA INN Akihabara" },
+                { time: "13:00", type: "trans", title: "前往機場", transit: [{ icon: "🚆", label: "秋葉原 ➡️ 日暮里", sub: "💰 ¥180", time: "10 MIN" }, { icon: "🚆", label: "日暮里 ➡️ 成田一航", sub: "💰 ¥2570", time: "36 MIN" }], nav: "Narita Airport Terminal 1" },
+                { time: "16:50", type: "trans", title: "回程航班：樂桃 MM625", nav: "Narita Airport Terminal 1" }
             ]}
         ];
 
@@ -337,8 +325,8 @@
             const scroller = document.getElementById('day-scroller');
             scroller.innerHTML = [1,2,3,4,5,6,7].map((d, idx) => `
                 <button onclick="changeDay(${idx})" id="day-btn-${idx}" class="flex-shrink-0 w-14 h-20 rounded-2xl flex flex-col items-center justify-center border-2 border-transparent bg-white shadow-sm transition-all click-effect">
-                    <span class="text-[10px] mb-1 font-sans">D${d}</span>
-                    <span class="text-lg font-bold font-sans font-sans">${d===1?'25':d===2?'26':d===3?'27':d===4?'28':d===5?'29':d===6?'30':'31'}</span>
+                    <span class="text-[10px] mb-1">D${d}</span>
+                    <span class="text-lg font-bold font-sans">${d===1?'25':d===2?'26':d===3?'27':d===4?'28':d===5?'29':d===6?'30':'31'}</span>
                 </button>
             `).join('');
             changeDay(0); setPayer('P'); setCurrency('JPY'); updateLedgerUI();
@@ -346,12 +334,12 @@
 
         function changeDay(idx) {
             document.querySelectorAll('#day-scroller button').forEach((btn, i) => { btn.className = i === idx ? "flex-shrink-0 w-14 h-20 rounded-2xl flex flex-col items-center justify-center border-2 border-jp-black bg-jp-black text-gray-400 shadow-sm" : "flex-shrink-0 w-14 h-20 rounded-2xl flex flex-col items-center justify-center border-2 border-transparent bg-white text-gray-900 shadow-sm"; });
-            const dayData = tripData.find(d => d.day === (idx + 1)) || { events: [{time: "09:00", type:"spot", title:"自由行程", note:"參見攻略分頁", nav:"Tokyo"}] };
-            document.getElementById('header-date').innerText = dayData.date;
+            const dayData = tripData[idx]; document.getElementById('header-date').innerText = dayData.date;
             const tl = document.getElementById('timeline');
             tl.innerHTML = dayData.events.map(ev => {
-                if(ev.type === 'route') return `<div class="route-line font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"><p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight font-sans font-sans">交通路徑 (${ev.time})</p><p class="text-[11px] text-gray-600 font-sans font-sans leading-snug font-sans font-sans font-sans">${ev.desc}</p></div>`;
-                return `<div class="flex gap-4 font-sans font-sans font-sans font-sans font-sans"><div class="flex flex-col items-center font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"><div class="w-2.5 h-2.5 rounded-full bg-slate-300 mt-2 font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"></div><div class="w-0.5 flex-grow bg-slate-100 font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"></div></div><div class="app-card flex-grow p-4 mb-2 font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"><div class="flex justify-between mb-1 font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans"><span class="text-xs font-mono font-bold text-blue-500 font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">${ev.time || '--:--'}</span><span class="tag-${ev.type} text-[8px] px-2 py-0.5 rounded font-bold uppercase font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">${ev.type}</span></div><h4 class="font-bold text-sm text-gray-800 font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">${ev.title}</h4><div class="text-[11px] text-gray-500 leading-normal mb-1 font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">${ev.note}</div><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.nav)}" target="_blank" class="block text-center mt-3 py-1.5 bg-gray-900 text-white rounded-lg text-[10px] font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">🧭 導航</a></div></div>`;
+                if(ev.type === 'route') return `<div class="route-line font-sans"><p class="text-[10px] text-gray-400 font-bold uppercase">交通建議 (${ev.time})</p><p class="text-[11px] text-gray-600 font-sans leading-snug font-sans">${ev.desc}</p></div>`;
+                let transitHtml = ev.transit ? `<div class="transit-container font-sans">${ev.transit.map(s => `<div class="transit-step font-sans"><div class="step-icon">${s.icon}</div><div class="step-info font-sans"><p class="font-bold">${s.label}</p>${s.desc ? `<p class="mt-0.5">${s.desc}</p>` : ''}${s.sub ? `<p class="step-subtext font-sans">${s.sub}</p>` : ''}</div><div class="step-time font-sans font-sans">${s.time}</div></div>`).join('')}</div>` : '';
+                return `<div class="flex gap-4 font-sans text-gray-700 font-sans"><div class="flex flex-col items-center font-sans font-sans"><div class="w-2.5 h-2.5 rounded-full bg-slate-300 mt-2 font-sans font-sans"></div><div class="w-0.5 flex-grow bg-slate-100 font-sans font-sans"></div></div><div class="app-card flex-grow p-4 mb-2 font-sans font-sans"><div class="flex justify-between mb-1 font-sans font-sans font-sans font-sans"><span class="text-xs font-mono font-bold text-blue-500 font-sans font-sans font-sans font-sans">${ev.time || '--:--'}</span><span class="tag-${ev.type} text-[8px] px-2 py-0.5 rounded font-bold uppercase font-sans font-sans font-sans font-sans">${ev.type}</span></div><h4 class="font-bold text-sm text-gray-800 font-sans font-sans font-sans font-sans font-sans">${ev.title}</h4><div class="text-[11px] text-gray-500 leading-normal mb-1 font-sans font-sans font-sans font-sans font-sans">${ev.note || ''}</div>${transitHtml}${ev.tip ? `<p class="text-[10px] bg-amber-50 p-2 rounded-lg mt-2 text-amber-700 font-sans font-sans font-sans">✨ ${ev.tip}</p>` : ''}<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.nav)}" target="_blank" class="block text-center mt-3 py-1.5 bg-gray-900 text-white rounded-lg text-[10px] font-bold font-sans font-sans font-sans font-sans font-sans font-sans">🧭 導航</a></div></div>`;
             }).join('');
         }
 
@@ -360,7 +348,7 @@
             document.getElementById(`page-${pageId}`).classList.add('active');
             document.querySelectorAll('nav button').forEach(btn => { btn.classList.remove('nav-active'); btn.classList.add('nav-inactive'); });
             document.getElementById(`nav-item-${pageId}`).classList.add('nav-active');
-            const titles = { schedule: '每日行程', tools: '預約中心', luggage: '行李與救援', pokepark: 'PokéPark 攻略', ledger: '旅行帳本' };
+            const titles = { schedule: '每日行程', tools: '預約中心', pokepark: 'PokéPark 攻略', luggage: '清單與救援', ledger: '旅行帳本' };
             document.getElementById('current-page-title').innerText = titles[pageId];
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -382,14 +370,14 @@
             const balance = { 'P': { JPY: 0, TWD: 0 }, '羊': { JPY: 0, TWD: 0 }, '威倫': { JPY: 0, TWD: 0 }, '陳岱': { JPY: 0, TWD: 0 } };
             list.innerHTML = expenses.map(exp => {
                 const cur = exp.currency; members.forEach(m => { const share = exp.splits[m] || 0; if (m === exp.payer) balance[m][cur] -= (exp.amount - share); else balance[m][cur] += share; });
-                return `<div class="app-card p-4 border-l-4 ${exp.payer==='P'?'border-blue-200':exp.payer==='羊'?'border-rose-200':'border-amber-200'} font-sans"><div class="flex justify-between items-center"><div><h4 class="text-xs font-bold font-sans font-sans font-sans font-sans">${exp.name}</h4><p class="text-[10px] font-mono text-gray-400 font-sans font-sans font-sans">${cur === 'JPY' ? '¥' : '$'} ${exp.amount.toLocaleString()} | ${exp.payer}</p></div><button onclick="deleteExpense(${exp.id})" class="text-gray-300 font-bold font-sans font-sans font-sans font-sans font-sans">✕</button></div></div>`;
+                return `<div class="app-card p-4 border-l-4 ${exp.payer==='P'?'border-blue-200':exp.payer==='羊'?'border-rose-200':'border-amber-200'} font-sans"><div class="flex justify-between items-center"><div><h4 class="text-xs font-bold font-sans">${exp.name}</h4><p class="text-[10px] font-mono text-gray-400 font-sans">${cur === 'JPY' ? '¥' : '$'} ${exp.amount.toLocaleString()} | ${exp.payer}</p></div><button onclick="deleteExpense(${exp.id})" class="text-gray-300 font-bold font-sans">✕</button></div></div>`;
             }).join('');
             members.forEach(m => {
                 const j = Math.round(balance[m].JPY); const t = Math.round(balance[m].TWD);
                 document.getElementById(`sum-jpy-${m}`).innerText = `¥ ${j.toLocaleString()}`;
                 document.getElementById(`sum-twd-${m}`).innerText = `$ ${t.toLocaleString()}`;
-                document.getElementById(`sum-jpy-${m}`).className = `font-mono text-[11px] ${j > 0 ? 'text-rose-400' : 'text-fuji-blue'} font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans`;
-                document.getElementById(`sum-twd-${m}`).className = `font-mono text-[11px] ${t > 0 ? 'text-rose-400' : 'text-fuji-blue'} font-bold font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans`;
+                document.getElementById(`sum-jpy-${m}`).className = `font-mono text-[11px] ${j > 0 ? 'text-rose-400' : 'text-fuji-blue'} font-bold font-sans font-sans`;
+                document.getElementById(`sum-twd-${m}`).className = `font-mono text-[11px] ${t > 0 ? 'text-rose-400' : 'text-fuji-blue'} font-bold font-sans font-sans`;
             });
         }
         window.onload = init;
